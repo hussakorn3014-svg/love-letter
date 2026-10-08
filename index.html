@@ -54,58 +54,182 @@
 .start-card .start-icon{font-size:67px;filter:drop-shadow(0 5px 8px #a66caa44);animation:headerFloat 2.4s infinite}.start-card h2{font-size:26px;margin:7px 0 5px}.start-card p{font-size:13px;margin:0 0 15px}.start-card button{border:0;border-radius:16px;background:linear-gradient(130deg,#ff85b9,#9b73e9);color:white;font:700 17px Kanit;padding:13px 25px;box-shadow:0 5px 0 #8053a0;cursor:pointer;width:100%}.start-card .start-hint{font-size:11px;margin-top:14px;color:#977ca3}
 #confettiLayer{position:fixed;inset:0;pointer-events:none;z-index:9;overflow:hidden}.confetti-piece{position:absolute;top:-30px;width:9px;height:16px;border-radius:2px;animation:confettiFall var(--duration) ease-in forwards;transform:rotate(var(--rot))}@keyframes confettiFall{to{top:110vh;transform:translateX(var(--drift)) rotate(900deg);opacity:0}}
 @media(prefers-reduced-motion:reduce){.machine:before,.marquee:before,.marquee:after,.start-card .start-icon{animation:none}}
-</style></head><body><main class="app"><span class="sparkle a">✦</span><span class="sparkle b">✧</span><header class="top"><h1>ญาณิศา ตู้คีบ</h1><div class="subtitle">ขอให้สนุกกับการคีบตุ๊กตา</div><div class="credit">Create by Hussakorn</div><div style="margin-top:10px"><button id="soundToggle" class="sound-toggle" type="button" aria-pressed="false">🎵 แตะเพื่อเปิดเพลง</button></div></header><section class="stats"><div class="stat"><span>🪙 เหรียญ</span><strong id="coins">6</strong></div><div class="stat"><span>🏆 คีบสำเร็จ</span><strong id="wins">0</strong></div><div class="stat"><span>🎯 โอกาสคีบ</span><strong id="tries">0</strong></div></section><div class="machine"><div class="bulb left"></div><div class="bulb right"></div><div class="marquee">✧ ญาณิศา ตู้คีบ ✧</div><div class="glass"><canvas id="game" width="420" height="405" aria-label="เกมคีบตุ๊กตา"></canvas></div><div class="panel"><div class="paneltop"><span>🎮 CONTROL PANEL</span><span class="pill" id="status">พร้อมเล่น!</span></div><div class="controls"><button class="ctrl" id="left" aria-label="เลื่อนซ้าย">◀</button><button class="ctrl" id="right" aria-label="เลื่อนขวา">▶</button><button class="ctrl drop" id="drop">✦ คีบเลย!</button></div></div></div><div class="coin-area"><button id="insertCoin" class="coin-button">🪙 หยอดเหรียญเพิ่ม (+6 ครั้ง)</button><span id="attemptNotice">เหลือโอกาสคีบ 6 ครั้ง</span></div><div class="pickup-area"><button class="pickup-button" id="pickup" disabled>🎁 หยิบตุ๊กตาจากช่อง PRIZE <span id="waiting">(0)</span></button><div class="pickup-note" id="pickupNote">คีบตุ๊กตาให้สำเร็จก่อน แล้วกดรับรางวัลที่ช่องด้านล่าง</div></div><div class="message" id="message" aria-live="polite">เลื่อนหัวคีบให้ตรงกับตุ๊กตา แล้วกดคีบ!</div><div class="collection" id="collection" aria-label="คอลเลกชันตุ๊กตาที่รับแล้ว"></div><div class="bottom"><div class="hint">⌨️ คอมพิวเตอร์: ← → และ Space<br>📱 มือถือ: กดปุ่มซ้าย–ขวาค้างเพื่อเลื่อน</div><button class="secondary" id="reset">⟳ รีเฟรช / เริ่มใหม่</button></div></main><div class="overlay" id="overlay"><div class="modal"><div class="big" id="resultEmoji">🧸</div><h2 id="resultTitle">เยี่ยมมาก!</h2><p id="resultText">คุณได้รับตุ๊กตาแล้ว</p><button id="continue">เล่นต่อ ✦</button></div></div><div id="startScreen"><div class="start-card"><div class="start-icon">🧸🪙</div><h2>ญาณิศา ตู้คีบ</h2><p>เกมตู้คีบญี่ปุ่น • 6 ครั้งต่อรอบ • ลุ้นรางวัล JACKPOT</p><button id="startGame" type="button">🪙 INSERT COIN · เริ่มเล่น</button><div class="start-hint">แตะเพื่อเริ่มเกมและเปิดเสียง Arcade บน iPhone</div></div></div><div id="confettiLayer" aria-hidden="true"></div><script>
+
+.arcade-score{text-align:center;margin-top:12px;padding:9px 12px;border:1px solid #ffdf98a8;background:linear-gradient(90deg,#ffdd8a20,#ff96cf25,#bfa0ff24);border-radius:14px;color:#ffe6a5;font-size:13px;font-weight:700;letter-spacing:.2px;text-shadow:0 1px 6px #422243}.machine.jackpot-flash{animation:jackpotFlash .45s ease-in-out 5!important}@keyframes jackpotFlash{0%,100%{filter:brightness(1)}50%{filter:brightness(1.6) drop-shadow(0 0 18px #ffde70)}}.arcade-score.pulse{animation:scorePulse .55s ease-out}@keyframes scorePulse{50%{transform:scale(1.07);color:#fff}}
+#realPrizePreview{display:block;margin:0 auto 4px;width:190px;height:190px;max-width:100%;filter:drop-shadow(0 12px 12px #bd83a566)}
+#realPrizePreview[hidden]{display:none!important}
+#realPrizePreview.prize-reveal{animation:realPrizePop .7s cubic-bezier(.16,1.5,.4,1) both}
+@keyframes realPrizePop{0%{transform:translateY(40px) scale(.5) rotate(-15deg);opacity:0}65%{transform:translateY(-9px) scale(1.08) rotate(5deg);opacity:1}100%{transform:none;opacity:1}}
+
+/* Deluxe light arrays and coin-insertion sequence */
+.machine{border:5px solid #ffe2f5;box-shadow:0 20px 60px #100823bb,0 0 18px #ff5ab5,0 0 48px #ff78ca77,inset 0 0 15px #fff7;}
+.machine::after{content:"";position:absolute;inset:1px;border-radius:24px;pointer-events:none;z-index:3;border:7px dotted #fff7b5;filter:drop-shadow(0 0 7px #fff5ae);animation:ledChase .85s linear infinite;}
+@keyframes ledChase{0%,100%{border-color:#fff8b4;filter:drop-shadow(0 0 5px #fff6ac)}25%{border-color:#ff80ed;filter:drop-shadow(0 0 10px #ff70f2)}50%{border-color:#80f7ff;filter:drop-shadow(0 0 12px #66f4ff)}75%{border-color:#c9ff8a;filter:drop-shadow(0 0 10px #d8ff7c)}}
+.marquee{border:2px solid #fff5b2;box-shadow:0 0 18px #fffbcb,0 0 35px #ff6ebf99,inset 0 0 16px #fff9;}
+.glass{border:7px solid #ffe6f6;box-shadow:inset 0 0 28px #fff9,0 0 18px #ffe1fa,0 0 28px #fa84d3;}
+.panel{border-color:#fff7b9;box-shadow:0 0 15px #ffedacaa,inset 0 -4px #dc77b2;}
+.machine.win-lights{animation:winCabinet .24s steps(2,end) 9!important;}
+.machine.win-lights-jackpot{animation:jackpotCabinet .17s steps(2,end) 24!important;}
+.machine.win-lights::after,.machine.win-lights-jackpot::after{animation:winLeds .13s steps(2,end) infinite!important;}
+@keyframes winCabinet{0%{filter:brightness(1);box-shadow:0 0 20px #f8d4ff}100%{filter:brightness(1.45);box-shadow:0 0 45px #fff4a6,0 0 90px #ff78c9}}
+@keyframes jackpotCabinet{0%{filter:hue-rotate(0deg) brightness(1.2)}100%{filter:hue-rotate(100deg) brightness(1.6);box-shadow:0 0 65px #fffb8b,0 0 95px #fa67e3}}
+@keyframes winLeds{0%{border-color:#fff}100%{border-color:#ffe94a;filter:drop-shadow(0 0 17px #fff)}}
+#coinAnimation{display:none;position:fixed;inset:0;z-index:9;pointer-events:none;align-items:center;justify-content:center;flex-direction:column;background:#120b2ca8;backdrop-filter:blur(3px)}
+#coinAnimation.active{display:flex}
+.coin-animation-title{font:700 27px Kanit;color:#fff3a5;letter-spacing:5px;text-shadow:0 0 18px #ffcc60;animation:coinTitle .35s infinite alternate}
+.coin-animation-coin{width:92px;height:92px;border-radius:50%;border:9px double #fff2a5;background:radial-gradient(circle at 35% 25%,#fff9d5,#f7c14a 60%,#ba7728);color:#fff6c1;display:grid;place-items:center;font:700 43px sans-serif;box-shadow:inset 0 0 10px #a7671c,0 0 25px #ffd36d;animation:coinFall 1.25s cubic-bezier(.4,0,.75,1) both;position:relative;z-index:1}
+.coin-animation-slot{height:19px;width:145px;border-radius:50%;background:#090918;border:5px solid #f2aee1;box-shadow:0 0 18px #ffa7eb, inset 0 0 8px #000;margin-top:110px}
+.coin-animation-label{font:600 16px Kanit;color:#fff;margin-top:20px}
+@keyframes coinFall{0%{transform:translateY(-240px) rotateY(0) scale(1);opacity:0}18%{opacity:1}80%{transform:translateY(104px) rotateY(800deg) scale(.85);opacity:1}100%{transform:translateY(145px) rotateY(900deg) scale(.1);opacity:0}}
+@keyframes coinTitle{to{filter:brightness(1.6)}}
+@media(prefers-reduced-motion:reduce){.machine::after{animation:none}#coinAnimation.active .coin-animation-coin{animation:coinFall 1.25s ease-in both}}
+
+/* Arcade expansion */
+.extra-arcade{margin:14px 0;padding:15px;border:1px solid #ffbfe6a0;border-radius:19px;background:linear-gradient(135deg,#382548dd,#674273a8);box-shadow:0 9px 25px #0003}
+.extra-arcade h3{margin:0 0 8px;font-size:16px;color:#ffe2f5}.extra-arcade p{margin:5px 0;font-size:12px;color:#f5d8f1}.extra-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}.extra-actions button{border:1px solid #ffcdf5;background:#ffffff20;color:white;border-radius:12px;padding:9px 12px;font:600 12px Kanit;cursor:pointer}.extra-actions button:disabled{opacity:.4}.extra-panel{margin-top:10px;background:#ffffff14;border-radius:12px;padding:10px}.extra-panel[hidden]{display:none!important}.rarity{font-size:11px;font-weight:700;letter-spacing:.5px}.rarity.common{color:#e5dbea}.rarity.rare{color:#82d8ff}.rarity.epic{color:#dfb2ff}.rarity.legendary{color:#ffdf74}.power-track{height:19px;border-radius:15px;background:linear-gradient(90deg,#b36aa1 0%,#c58ddd 30%,#fbe16e 45%,#ffe58d 55%,#c58ddd 70%,#b36aa1 100%);overflow:hidden;position:relative;border:2px solid #fff8}.power-marker{position:absolute;top:0;bottom:0;width:5px;background:#fff;box-shadow:0 0 8px white;left:0}.arcade-banner{margin:6px 0;padding:8px;border-radius:10px;background:#ffc4e52b;color:#fff4a9;text-align:center;font-size:12px}.rainbow-mode .machine{animation:rainbowPulse 1s linear infinite!important}@keyframes rainbowPulse{0%{filter:hue-rotate(0)}100%{filter:hue-rotate(360deg)}}
+
+/* Cabinet lobby and coin selector */
+.cabinet-lobby{margin:12px 0;padding:13px;border:1px solid #ffd5f1;border-radius:18px;background:linear-gradient(145deg,#fff3fc22,#b9a4ff1a)}
+.cabinet-lobby h3{font-size:14px;margin:0 0 8px;text-align:center;color:#ffe3f8}.cabinet-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.cabinet-choice{color:#fff;border:2px solid #ffffff50;background:linear-gradient(145deg,var(--cab1),var(--cab2));border-radius:13px;min-height:78px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;font:600 12px Kanit;cursor:pointer;box-shadow:inset 0 2px #ffffff66,0 4px 12px #0003;transition:transform .2s,border-color .2s}
+.cabinet-choice .cab-emoji{font-size:25px}.cabinet-choice.selected{border-color:#fff7a4;box-shadow:0 0 0 2px #ffd65b,0 0 17px #ffda6c70;transform:translateY(-2px)}.cabinet-choice:disabled{opacity:.45}
+.coin-picker{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin:10px 0 4px}.coin-picker label{font-size:12px;color:#ffe7f5}.coin-picker select{font:600 13px Kanit;border-radius:9px;border:2px solid #f7c4e2;padding:7px 12px;color:#713c70;background:#fff5fc;max-width:100%}.cabinet-description{text-align:center;font-size:11px;color:#f7d6ee;margin-top:7px}.cabinet-lobby .locknote{font-size:10px;color:#f6cee7;text-align:center;margin:5px 0 0}
+#startScreen .cabinet-lobby{background:#9b6ca81c;border-color:#d7a5df}#startScreen .cabinet-lobby h3{color:#855184}#startScreen .coin-picker label,#startScreen .cabinet-description,#startScreen .locknote{color:#855184}
+.machine[data-cabinet="sakura"]{background:linear-gradient(110deg,#ffa3d4,#ed6ab0 60%,#a75caa)}.machine[data-cabinet="ocean"]{background:linear-gradient(110deg,#94e9f5,#6aa3e9 60%,#7270c9);border-color:#c7f7ff}.machine[data-cabinet="candy"]{background:linear-gradient(110deg,#f9a8e9,#b793ff 55%,#ef95c4);border-color:#ffe0ff}.machine[data-cabinet="royal"]{background:linear-gradient(110deg,#f7d97d,#e4aa5a 55%,#9b6db2);border-color:#ffedb4}
+@media(max-width:370px){.cabinet-grid{gap:6px}.cabinet-choice{font-size:11px;min-height:68px}}
+
+body.special-led .machine{box-shadow:0 0 30px #fff6b0,0 0 55px #fc81e9,0 0 80px #80eaff!important}/* Immersive arcade lobby and extra systems */
+#arcadeRoom{position:fixed;inset:0;z-index:110;background:radial-gradient(ellipse at 50% 15%,#65308e,#170c32 75%);overflow-y:auto;padding:24px 14px;color:white;display:none}#arcadeRoom.open{display:block}#arcadeRoom .room-inner{max-width:760px;margin:auto;text-align:center}#arcadeRoom h2{font-size:clamp(23px,6vw,37px);margin:12px 0 3px;color:#ffe3fa;text-shadow:0 0 22px #ff72dd}#arcadeRoom p{font-size:13px;color:#e7cdea}#roomMachines{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin:22px 0} .room-machine{position:relative;min-height:198px;display:flex;align-items:center;flex-direction:column;justify-content:space-around;border:5px solid #ffefbb;border-radius:18px 18px 24px 24px;background:linear-gradient(135deg,var(--cab1),var(--cab2));box-shadow:0 0 14px var(--cab1),inset 0 0 14px #fff9;cursor:pointer;color:#fff;font-family:inherit;animation:roomGlow 1.9s ease-in-out infinite alternate}.room-machine:before{content:'✦ ✦ ✦ ✦ ✦';letter-spacing:6px;font-size:12px;color:#fff5b1;text-shadow:0 0 8px white}.room-machine .room-glass{display:grid;place-items:center;background:linear-gradient(140deg,#fff9,#ffffff18);width:80%;height:88px;border:4px solid #fff9;border-radius:10px;font-size:34px;box-shadow:inset 0 0 16px #fff7}.room-machine strong{font-size:13px;text-shadow:0 2px 5px #0007}.room-machine.selected{outline:4px solid #ffeb7d}.room-machine .room-door{width:48%;height:12px;background:#241436;border:3px solid #fff7;border-radius:6px}.room-machine:active{transform:scale(.97)}@keyframes roomGlow{to{box-shadow:0 0 28px var(--cab1),0 0 12px #fff8,inset 0 0 24px #fff8}}.room-actions{position:sticky;bottom:0;padding:12px;background:#1d103be8;border-radius:18px}.room-actions button,#openRoom,#roomBack{background:linear-gradient(120deg,#ffe17c,#ff9ad6);color:#4d2145;border:0;border-radius:13px;padding:11px 18px;font:700 14px Kanit,system-ui;cursor:pointer;margin:5px}.room-machine small{font-size:10px}#arcadeStats{margin:14px auto;padding:13px;border:1px solid #fff6;border-radius:14px;font-size:12px;line-height:2}#ticketInfo{margin:9px 0;color:#ffe6a3;font-weight:700}.arcade-shop{margin-top:12px;padding:12px;border:1px solid #eac3f1;border-radius:13px}.arcade-shop button{margin:4px;padding:9px;border-radius:10px;border:1px solid #ffddfa;background:#7c438e;color:white;font:600 12px Kanit}.machine.reward-flash{animation:rewardPulse .24s linear 10!important}@keyframes rewardPulse{50%{filter:brightness(1.85) saturate(1.8)}}@media(min-width:650px){#roomMachines{grid-template-columns:repeat(4,minmax(0,1fr))}.room-machine{min-height:230px}}
+@media(max-width:600px){html,body{overscroll-behavior-y:contain}button{touch-action:manipulation}#left,#right,#drop{touch-action:none;user-select:none;-webkit-user-select:none} .app{padding-bottom:max(16px,env(safe-area-inset-bottom))}}
+
+/* Multi-player profiles, mobile first */
+#profileBar{position:sticky;top:0;z-index:85;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 13px;background:#211531f2;color:#fff;border:1px solid #ffd3ed66;border-radius:14px;margin-bottom:10px;box-shadow:0 4px 15px #0004}
+#profileBar button,.profile-action{border:0;border-radius:13px;padding:11px 15px;font:600 14px Kanit,system-ui;min-height:44px;background:#ffd2eb;color:#53204b}
+#profileGate{position:fixed;inset:0;z-index:300;background:#120c22ed;display:flex;align-items:center;justify-content:center;padding:18px;overflow:auto}
+#profileGate[hidden]{display:none!important}
+.profile-card{width:min(100%,440px);max-height:90dvh;overflow:auto;padding:22px 17px;border:2px solid #f6addb;border-radius:24px;background:linear-gradient(145deg,#ffeaf8,#e5d9ff);color:#4d2757;text-align:center;box-shadow:0 20px 60px #0008}
+.profile-card h2{font-size:24px;margin:4px 0}.profile-card p{font-size:13px;margin:6px 0 14px}
+#profileList{display:grid;gap:9px;margin:15px 0}#profileList button{border:2px solid #d8add8;border-radius:14px;background:#fff9ff;color:#572b63;padding:14px;text-align:left;font:600 16px Kanit,system-ui;min-height:56px}
+#profileName{font:500 16px Kanit,system-ui;width:100%;padding:12px;border-radius:12px;border:2px solid #c8a1cf;background:white;color:#42234e;margin:5px 0 10px}
+.profile-error{min-height:20px;color:#a31852;font-size:13px}
+</style><style>
+/* Mobile arcade hub */
+.mobile-nav{position:sticky;bottom:0;z-index:60;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;padding:8px 5px max(9px,env(safe-area-inset-bottom));background:#241331f5;border-top:2px solid #ffbbdf;box-shadow:0 -5px 25px #12091d88}.mobile-nav button{min-height:51px;border:0;border-radius:11px;background:#fff1fa;color:#64366c;font:600 11px Kanit,system-ui;line-height:1.35;padding:5px 2px}.mobile-nav button:active{transform:scale(.95)}
+.mobile-sheet{position:fixed;inset:0;z-index:210;background:#160c2af2;display:none;align-items:center;justify-content:center;padding:14px}.mobile-sheet.open{display:flex}.mobile-sheet .sheet-inner{background:linear-gradient(145deg,#fff3fb,#e8dcff);color:#4b285e;border:2px solid #fff;border-radius:23px;padding:17px;width:min(100%,470px);max-height:86dvh;overflow-y:auto;box-shadow:0 20px 65px #0009}.sheet-inner h2{margin:0 0 10px}.sheet-inner button,.sheet-inner select{font:600 14px Kanit,system-ui;border:1px solid #c6a1d0;border-radius:12px;background:#fff;color:#572b65;padding:11px;min-height:44px}.sheet-inner .actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.sheet-inner .actions button{flex:1 1 130px}.sheet-inner p{font-size:13px}.sheet-inner .close-sheet{float:right;background:#f8d4e9}.sheet-inner .mini-cat{display:inline-block;font-size:40px;animation:petFloat 2s ease-in-out infinite;cursor:pointer}.pet-room{min-height:180px;border-radius:18px;background:linear-gradient(#e4c6f8 60%,#f7c6df 60%);display:flex;align-items:center;justify-content:space-around;flex-wrap:wrap;gap:10px;padding:14px}.pet-room button{border:0;background:#fff9;border-radius:14px}.pet-room button:active .mini-cat{transform:scale(1.18)}@keyframes petFloat{50%{translate:0 -9px}}.touch-helpers{display:flex;justify-content:center;gap:8px;margin:9px auto}.touch-helpers button{min-width:80px;min-height:48px;background:#e9d7ff;color:#492d5e;border:2px solid #fff;border-radius:14px;font:700 14px Kanit}.mobile-info{font-size:12px;color:#ffe7f7;text-align:center;margin:7px auto}.mobile-sheet input{font-size:16px}button{touch-action:manipulation}@media(max-width:430px){.app{padding-left:8px!important;padding-right:8px!important}.mobile-nav button{font-size:10px}.touch-helpers button{min-width:66px}}@media(prefers-reduced-motion:reduce){.mini-cat{animation:none}}
+</style></head><body><main class="app"><div id="profileBar"><span id="activePlayer">🐱 ยังไม่ได้เลือกผู้เล่น</span><button type="button" id="switchPlayer">👤 เปลี่ยนผู้เล่น</button></div><span class="sparkle a">✦</span><span class="sparkle b">✧</span><header class="top"><h1>ญาณิศา ตู้คีบ</h1><div class="subtitle">ขอให้สนุกกับการคีบตุ๊กตา</div><div class="credit">Create by Hussakorn</div><div style="margin-top:10px"><button id="soundToggle" class="sound-toggle" type="button" aria-pressed="false">🎵 แตะเพื่อเปิดเพลง</button></div></header><section class="stats"><div class="stat"><span>🪙 เหรียญ</span><strong id="coins">0</strong></div><div class="stat"><span>🏆 คีบสำเร็จ</span><strong id="wins">0</strong></div><div class="stat"><span>🎯 โอกาสคีบ</span><strong id="tries">0</strong></div></section><div class="machine"><div class="bulb left"></div><div class="bulb right"></div><div class="marquee">✧ ญาณิศา ตู้คีบ ✧</div><div class="glass"><canvas id="game" width="420" height="405" aria-label="เกมคีบตุ๊กตา"></canvas></div><div class="panel"><div class="paneltop"><span>🎮 CONTROL PANEL</span><span class="pill" id="status">รอหยอดเหรียญ</span></div><div class="controls"><button class="ctrl" id="left" aria-label="เลื่อนซ้าย">◀</button><button class="ctrl" id="right" aria-label="เลื่อนขวา">▶</button><button class="ctrl drop" id="drop">✦ คีบเลย!</button></div></div></div><div style="text-align:center;margin:10px"><button id="openRoom" type="button">🎪 เข้าห้อง Arcade · เลือกตู้คีบ</button></div><section class="cabinet-lobby" id="cabinetLobby"><h3>🎪 เลือกตู้คีบที่อยากเล่น</h3><div class="cabinet-grid" id="cabinetGrid"></div><div class="coin-picker"><label for="coinCount">🪙 จำนวนเหรียญ</label><select id="coinCount"><option value="1">1 เหรียญ · 1 ครั้ง</option><option value="2">2 เหรียญ · 2 ครั้ง</option><option value="3">3 เหรียญ · 3 ครั้ง</option><option value="5">5 เหรียญ · 5 ครั้ง</option></select></div><div class="cabinet-description" id="cabinetDescription">แมวซากุระสีชมพู</div><p class="locknote">เปลี่ยนตู้ได้เมื่อหัวคีบหยุดและไม่มีรางวัลค้างในช่อง PRIZE</p></section><div class="coin-area"><button id="insertCoin" class="coin-button">🪙 หยอดเหรียญเพิ่ม</button><span id="attemptNotice">กรุณาหยอดเหรียญก่อนเล่น</span></div><div class="pickup-area"><button class="pickup-button" id="pickup" disabled>🎁 หยิบตุ๊กตาจากช่อง PRIZE <span id="waiting">(0)</span></button><div class="pickup-note" id="pickupNote">คีบตุ๊กตาให้สำเร็จก่อน แล้วกดรับรางวัลที่ช่องด้านล่าง</div></div><div class="arcade-score" id="arcadeScore">⭐ คะแนน 0 · 🔥 คอมโบ 0</div><div class="message" id="message" aria-live="polite">🪙 หยอดเหรียญเพื่อเริ่มเล่น</div><div class="collection" id="collection" aria-label="คอลเลกชันตุ๊กตาที่รับแล้ว"></div><section class="extra-arcade" id="arcadeExtras"><h3>🌟 ARCADE CHALLENGE</h3><div class="arcade-banner" id="rarityHint">🎁 Common · Rare · Epic · Legendary</div><p id="missionText">🎯 ภารกิจ: คีบตุ๊กตาให้สำเร็จ 3 ตัว</p><p id="dailyText">🎉 โบนัสรายวัน: ยังไม่ได้รับ</p><p id="modeText">🌈 Rainbow Time: ยังไม่เริ่ม</p><div class="extra-actions"><button id="difficultyBtn">🎚️ ระดับ: ปกติ</button><button id="albumBtn">📒 สมุดสะสม</button><button id="wheelBtn" disabled>🎡 วงล้อโบนัส (0)</button><button id="dailyBtn">🎁 รับโบนัสรายวัน</button></div><div class="arcade-shop"><div id="ticketInfo">🎟️ ตั๋วสะสม 0 ใบ</div><button id="shopBow">🎀 ปลดล็อกโบว์ (20 ตั๋ว)</button><button id="shopGlow">✨ ปลดล็อกไฟพิเศษ (35 ตั๋ว)</button><div id="arcadeStats">📊 สถิติการเล่น</div></div><div class="extra-panel" id="albumPanel" hidden><strong>📒 คอลเลกชันสะสมถาวร</strong><div id="albumContents"></div></div><div class="extra-panel" id="wheelPanel" hidden><p id="wheelResult">หมุนวงล้อเพื่อรับโบนัส!</p></div><div class="extra-panel" id="powerPanel" hidden><p>⚡ จับจังหวะ! กดปุ่มคีบอีกครั้งเมื่อเข็มอยู่ตรงกลางสีทอง</p><div class="power-track"><div class="power-marker" id="powerMarker"></div></div><p id="powerInfo">แตะ ✦ คีบเลย! อีกครั้งเพื่อหยุดเข็ม</p></div></section><div class="bottom"><div class="hint">⌨️ คอมพิวเตอร์: ← → และ Space<br>📱 มือถือ: กดปุ่มซ้าย–ขวาค้างเพื่อเลื่อน</div><button class="secondary" id="reset">⟳ รีเฟรช / เริ่มใหม่</button></div></main><div class="overlay" id="overlay"><div class="modal"><div class="big" id="resultEmoji">🧸</div><canvas id="realPrizePreview" width="220" height="220" hidden aria-label="ตุ๊กตาที่หยิบได้จริง"></canvas><h2 id="resultTitle">เยี่ยมมาก!</h2><p id="resultText">คุณได้รับตุ๊กตาแล้ว</p><button id="continue">เล่นต่อ ✦</button></div></div><div id="startScreen"><div class="start-card"><div class="start-icon">🧸🪙</div><h2>ญาณิศา ตู้คีบ</h2><p>เลือกตู้แมวธีมโปรด • 1 เหรียญ = 1 ครั้ง • ลุ้น JACKPOT</p><button id="roomFromStart" type="button" style="margin-bottom:10px">🎪 เดินเลือกตู้ในห้อง Arcade</button><section class="cabinet-lobby"><h3>🎪 เลือกตู้คีบ</h3><div class="cabinet-grid" id="startCabinetGrid"></div><div class="coin-picker"><label for="startCoinCount">🪙 หยอดกี่เหรียญ?</label><select id="startCoinCount"><option value="1">1 เหรียญ · 1 ครั้ง</option><option value="2">2 เหรียญ · 2 ครั้ง</option><option value="3">3 เหรียญ · 3 ครั้ง</option><option value="5">5 เหรียญ · 5 ครั้ง</option></select></div><div class="cabinet-description" id="startCabinetDescription">แมวซากุระสีชมพู</div></section><button id="startGame" type="button">🪙 INSERT COIN · หยอดเหรียญเริ่มเกม</button><div class="start-hint">แตะเพื่อเริ่มเกมและเปิดเสียง Arcade บน iPhone</div></div></div><section id="arcadeRoom" aria-label="ห้อง Arcade"><div class="room-inner"><h2>🎪 ญาณิศา ARCADE</h2><p>เลือกตู้คีบที่ชอบ • แต่ละตู้มีแมวประจำธีม • 1 เหรียญ = 1 ครั้ง</p><div id="roomMachines"></div><div class="room-actions"><div id="roomSelected">เลือกตู้ที่อยากเล่น</div><button id="roomBack" type="button">🎮 ไปเล่นตู้ที่เลือก</button></div></div></section><div id="confettiLayer" aria-hidden="true"></div><div id="coinAnimation" aria-hidden="true"><div class="coin-animation-title">INSERT COIN</div><div class="coin-animation-coin">★</div><div class="coin-animation-slot"></div><div class="coin-animation-label">กำลังหยอดเหรียญ...</div></div><script>
 (()=>{'use strict';
-const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');const $=id=>document.getElementById(id);
+const canvas=document.getElementById('game');let ctx=canvas.getContext('2d');const $=id=>document.getElementById(id);
 const W=420,H=405,ground=344,HOME=61,TOP=62;
-const kinds=[{kind:'bear',color:'#dba879',name:'น้องหมี',emoji:'🧸'},{kind:'bunny',color:'#fff0f1',name:'น้องกระต่าย',emoji:'🐰'},{kind:'cat',color:'#f9c59d',name:'น้องแมว',emoji:'🐱'},{kind:'panda',color:'#f7f5f6',name:'น้องแพนด้า',emoji:'🐼'},{kind:'frog',color:'#a7dcad',name:'น้องกบ',emoji:'🐸'},{kind:'pig',color:'#ffb9cb',name:'น้องหมู',emoji:'🐷'},{kind:'fox',color:'#efaa73',name:'น้องจิ้งจอก',emoji:'🦊'},{kind:'koala',color:'#c1c7d9',name:'น้องโคอาล่า',emoji:'🐨'}];
-let toys=[],coins=6,wins=0,tries=0,x=210,y=TOP,phase='idle',elapsed=0,grabbed=null,move=0,last=0,dropToy=null,dropV=0,success=false,activeToy=null,clawOpen=1,shake=0,waitingPrizes=[],hatchToys=[],flyingToy=null,flightTime=0;
+const cabinets=[
+{id:'sakura',name:'Sakura Kitty',icon:'🌸🐱',desc:'แมวซากุระ • ชมพู พีช ขาว',a:'#ff91c7',b:'#b65eaa',palette:[['#ffe2ed','#f4a7c6','แมวชมพูโมจิ','heart'],['#fff6fb','#e7a3c8','แมวหิมะซากุระ','flower'],['#ffdfd0','#e6a28d','แมวพีช','stripe'],['#f9d5f0','#c789c4','แมวกลีบบัว','flower']]},
+{id:'ocean',name:'Ocean Kitty',icon:'🐬🐱',desc:'แมวทะเล • ฟ้า มิ้นต์ น้ำเงิน',a:'#67d9eb',b:'#6583d3',palette:[['#cceeff','#73b3e8','แมวคลื่นทะเล','stripe'],['#d7fff3','#77cfc0','แมวฟองสบู่','heart'],['#e0e7ff','#94a2db','แมวดวงดาวทะเล','star'],['#b9f3fa','#65b9c8','แมวปะการัง','flower']]},
+{id:'candy',name:'Candy Kitty',icon:'🍬🐱',desc:'แมวขนมหวาน • ม่วง ครีม มิ้นต์',a:'#d99df4',b:'#e97dbe',palette:[['#f2dfff','#b68de0','แมวลาเวนเดอร์','star'],['#fff1c9','#e5bc75','แมวพุดดิ้ง','stripe'],['#fdd7ed','#e99bbd','แมวสายไหม','heart'],['#d7f5e9','#7bc9b5','แมวไอศกรีม','flower']]},
+{id:'royal',name:'Royal Kitty',icon:'👑🐱',desc:'แมวราชวงศ์ • ทอง ขาว ม่วง',a:'#f0c75c',b:'#ad7ac0',palette:[['#ffe8ad','#d7a444','แมวทองเจ้าหญิง','star'],['#fffaf0','#cfbb8d','แมวไข่มุก','heart'],['#e7d6fb','#ab85cb','แมวอัญมณี','star'],['#f8d8c0','#cf9d75','แมวราชสำนัก','stripe']]}
+
+,{id:'halloween',name:'Halloween Kitty',icon:'🎃🐱',desc:'แมวฮาโลวีน • ส้ม ม่วง ดำ',a:'#ef984d',b:'#65318d',palette:[['#ffbc77','#9c52aa','แมวฟักทอง','star'],['#c4a1df','#613875','แมวแม่มด','heart'],['#e8d9f5','#a86bb4','แมวผีจิ๋ว','stripe']]}
+,{id:'christmas',name:'Christmas Kitty',icon:'🎄🐱',desc:'แมวคริสต์มาส • แดง เขียว หิมะ',a:'#e85f79',b:'#368d80',palette:[['#fff6f1','#e35e75','แมวหิมะ','heart'],['#d4f5df','#5aaa8a','แมวต้นสน','star'],['#ffdddf','#ce5473','แมวของขวัญ','stripe']]}
+,{id:'galaxy',name:'Galaxy Kitty',icon:'🌌🐱',desc:'แมวอวกาศ • น้ำเงิน ม่วง ดาว',a:'#6a78e8',b:'#5d338e',palette:[['#c4c5ff','#7774c8','แมวดวงดาว','star'],['#d4b9ff','#a574e3','แมวเนบิวลา','heart'],['#c8e9fa','#7292d4','แมวดาวหาง','stripe']]}
+,{id:'winter',name:'Winter Kitty',icon:'❄️🐱',desc:'แมวฤดูหนาว • ขาว ฟ้า เงิน',a:'#9ce5ff',b:'#668bcb',palette:[['#f4fbff','#9cc9ea','แมวเกล็ดหิมะ','star'],['#dceeff','#8eafdc','แมวฟรอสต์','stripe'],['#e4f8fa','#8bcfd6','แมวน้ำแข็ง','heart']]}
+];
+let currentCabinet=cabinets[0],chosenCoins=1;
+function renderCabinetButtons(){for(const id of ['cabinetGrid','startCabinetGrid']){const root=$(id);root.replaceChildren();for(const cab of cabinets){const b=document.createElement('button');b.type='button';b.className='cabinet-choice'+(currentCabinet.id===cab.id?' selected':'');b.style.setProperty('--cab1',cab.a);b.style.setProperty('--cab2',cab.b);b.innerHTML='<span class="cab-emoji">'+cab.icon+'</span><span>'+cab.name+'</span>';b.addEventListener('click',()=>selectCabinet(cab.id));root.appendChild(b)}}$('cabinetDescription').textContent=currentCabinet.desc;$('startCabinetDescription').textContent=currentCabinet.desc;document.querySelector('.machine').dataset.cabinet=currentCabinet.id;document.querySelector('.marquee').textContent='✧ '+currentCabinet.name+' ✧'}
+function selectCabinet(id){if(phase!=='idle'||coinAnimating||waitingPrizes.length){msg('กรุณารอหัวคีบหยุดและหยิบตุ๊กตาจากช่อง PRIZE ก่อนเปลี่ยนตู้');return}const cab=cabinets.find(c=>c.id===id);if(!cab)return;currentCabinet=cab;populate();decorateRarity();renderCabinetButtons();msg('🎪 เลือกตู้ '+cab.name+' แล้ว! โอกาสคีบคงเดิม');}
+function updateCoinSelection(v){chosenCoins=Math.max(1,Math.min(5,Number(v)||1));$('coinCount').value=String(chosenCoins);$('startCoinCount').value=String(chosenCoins);$('insertCoin').textContent='🪙 หยอด '+chosenCoins+' เหรียญ (+'+chosenCoins+' ครั้ง)';}
+
+const kinds=[
+{kind:'cat',color:'#ffe2ed',accent:'#f4a7c6',name:'แมวชมพูโมจิ',emoji:'🐱',pattern:'heart'},
+{kind:'cat',color:'#f5e8ff',accent:'#bb9be3',name:'แมวม่วงลาเวนเดอร์',emoji:'🐱',pattern:'star'},
+{kind:'cat',color:'#fff5d4',accent:'#e9bd69',name:'แมวครีมพุดดิ้ง',emoji:'🐱',pattern:'stripe'},
+{kind:'cat',color:'#d7f5ef',accent:'#76cbbd',name:'แมวมิ้นต์',emoji:'🐱',pattern:'heart'},
+{kind:'cat',color:'#dcecff',accent:'#8eafe7',name:'แมวฟ้าสายไหม',emoji:'🐱',pattern:'star'},
+{kind:'cat',color:'#ffdcca',accent:'#e69b7b',name:'แมวส้มมาร์ชเมลโล',emoji:'🐱',pattern:'stripe'},
+{kind:'cat',color:'#f9f8fa',accent:'#b2a9bb',name:'แมวขาวไข่มุก',emoji:'🐱',pattern:'heart'},
+{kind:'cat',color:'#e0d8e8',accent:'#9b8baa',name:'แมวเทาควัน',emoji:'🐱',pattern:'stripe'},
+{kind:'cat',color:'#fbd6e8',accent:'#d88ac2',name:'แมวซากุระ',emoji:'🐱',pattern:'flower'},
+{kind:'cat',color:'#ffe8b5',accent:'#e6aa3c',name:'แมวทองประกายดาว',emoji:'🐱',pattern:'star'}
+];
+let toys=[],coins=0,wins=0,tries=0,x=210,y=TOP,phase='idle',elapsed=0,grabbed=null,move=0,last=0,dropToy=null,dropV=0,success=false,activeToy=null,clawOpen=1,shake=0,waitingPrizes=[],hatchToys=[],flyingToy=null,flightTime=0;
 const rand=(a,b)=>a+Math.random()*(b-a),clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),lerp=(a,b,t)=>a+(b-a)*t;
-function populate(){toys=[];const slots=[];for(let row=0;row<2;row++)for(let i=0;i<5;i++)slots.push({x:47+i*80+rand(-5,5),y:ground-30-row*53+rand(-3,3)});for(let i=0;i<10;i++){const k=kinds[(i*3+Math.floor(i/5)*2)%kinds.length],spot=slots[i];toys.push({...k,...spot,size:29,tilt:rand(-.16,.16),taken:false,special:false})}const lucky=Math.floor(rand(0,toys.length));Object.assign(toys[lucky],{kind:'bear',name:'น้องหมีทองคำ รางวัลใหญ่',emoji:'👑',color:'#f7ce64',special:true,size:32})}
+function populate(){toys=[];const slots=[];for(let row=0;row<2;row++)for(let i=0;i<5;i++)slots.push({x:47+i*80+rand(-5,5),y:ground-30-row*53+rand(-3,3)});for(let i=0;i<10;i++){const entry=currentCabinet.palette[(i*3+Math.floor(i/5)*2)%currentCabinet.palette.length],spot=slots[i];toys.push({kind:'cat',color:entry[0],accent:entry[1],name:entry[2],emoji:'🐱',pattern:entry[3],...spot,size:29,tilt:rand(-.16,.16),taken:false,special:false,cabinet:currentCabinet.id})}const lucky=Math.floor(rand(0,toys.length));Object.assign(toys[lucky],{kind:'cat',name:'แมวทองคำ '+currentCabinet.name+' JACKPOT',emoji:'🐱',color:'#ffe39a',accent:'#e4ac36',pattern:'star',special:true,size:32,cabinet:currentCabinet.id})}
 function shuffleToys(){const available=toys.filter(t=>!t.taken);if(available.length<2)return;const spots=available.map(t=>({x:t.x,y:t.y}));for(let i=spots.length-1;i>0;i--){const j=Math.floor(rand(0,i+1));[spots[i],spots[j]]=[spots[j],spots[i]]}available.forEach((t,i)=>{t.fromX=t.x;t.fromY=t.y;t.toX=spots[i].x;t.toY=spots[i].y;t.shuffleProgress=0})}
 function animateShuffle(dt){for(const t of toys){if(t.shuffleProgress===undefined||t.shuffleProgress>=1)continue;t.shuffleProgress=Math.min(1,t.shuffleProgress+dt/850);const q=t.shuffleProgress,k=q*q*(3-2*q);t.x=lerp(t.fromX,t.toX,k);t.y=lerp(t.fromY,t.toY,k)}}
-function stats(){$('coins').textContent=coins;$('wins').textContent=wins;$('tries').textContent=tries;$('attemptNotice').textContent=coins>0?'เหลือโอกาสคีบ '+coins+' ครั้ง':'ครบ 6 ครั้งแล้ว — กรุณาหยอดเหรียญเพิ่ม หรือเริ่มเกมใหม่ (ปุ่มรีเฟรช)';$('insertCoin').disabled=coins>0}function msg(s){$('message').textContent=s}function rr(x,y,w,h,r,color){ctx.fillStyle=color;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill()}
+const GAME_SAVE_KEY='yanisa_mobile_game_v1';
+let restoringGame=false;
+function saveGameSession(){
+ if(restoringGame)return;
+ try{localStorage.setItem(GAME_SAVE_KEY,JSON.stringify({version:1,cabinet:currentCabinet.id,coins,wins,tries,score,streak,chosenCoins,toys:toys.map(t=>({...t})),waitingPrizes:waitingPrizes.map(t=>({...t})),savedAt:Date.now()}))}catch(e){}
+}
+function restoreGameSession(){
+ try{
+ const d=JSON.parse(localStorage.getItem(GAME_SAVE_KEY)||'null');if(!d||d.version!==1)return false;
+ restoringGame=true;
+ const cab=cabinets.find(c=>c.id===d.cabinet);if(cab)currentCabinet=cab;
+ coins=Math.max(0,Math.floor(Number(d.coins)||0));wins=Math.max(0,Math.floor(Number(d.wins)||0));tries=Math.max(0,Math.floor(Number(d.tries)||0));
+ score=Math.max(0,Number(d.score)||0);streak=Math.max(0,Number(d.streak)||0);
+ if(Array.isArray(d.toys)&&d.toys.length&&d.toys.length<=40)toys=d.toys;
+ waitingPrizes=Array.isArray(d.waitingPrizes)?d.waitingPrizes.slice(0,30):[];
+ hatchToys=waitingPrizes.slice();
+ updateCoinSelection(d.chosenCoins||1);
+ renderCabinetButtons();updatePickup();scoreDisplay();
+ $('startScreen').classList.add('hidden');
+ restoringGame=false;return true;
+ }catch(e){restoringGame=false;return false}
+}
+window.addEventListener('pagehide',saveGameSession);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)saveGameSession()});
+function stats(){saveGameSession();$('coins').textContent=coins;$('wins').textContent=wins;$('tries').textContent=tries;$('attemptNotice').textContent=coins>0?'เหลือโอกาสคีบ '+coins+' ครั้ง':tries===0?'กรุณาหยอดเหรียญก่อนเล่น':'โอกาสหมดแล้ว — กรุณาหยอดเหรียญเพิ่ม หรือเริ่มเกมใหม่ (ปุ่มรีเฟรช)';$('insertCoin').disabled=coinAnimating||phase!=='idle'}function msg(s){$('message').textContent=s}function rr(x,y,w,h,r,color){ctx.fillStyle=color;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill()}
 function ellipse(x,y,rx,ry,color){ctx.fillStyle=color;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fill()}
-function plush(t,shadow=true){ctx.save();ctx.translate(t.x,t.y);ctx.rotate(t.tilt||0);if(t.special){ctx.shadowColor='#ffe68b';ctx.shadowBlur=20}const s=t.size||29;ctx.scale(s/30,s/30);
-if(shadow){ctx.save();ctx.globalAlpha=.16;ellipse(2,31,27,6,'#68426b');ctx.restore()}
-ctx.shadowColor='#8c59714d';ctx.shadowBlur=5;ctx.shadowOffsetY=2;
-const base=t.color, dark=t.kind==='panda'?'#383847':t.kind==='koala'?'#969eb2':t.kind==='frog'?'#7abf8a':t.kind==='pig'?'#ec90a9':'#c98e78';
-// soft plush ears, tailored to each animal
-if(t.kind==='bunny'){ctx.save();ctx.rotate(-.12);ellipse(-14,-35,8,21,base);ellipse(-14,-36,3.5,14,'#f4b7c9');ctx.restore();ctx.save();ctx.rotate(.12);ellipse(14,-35,8,21,base);ellipse(14,-36,3.5,14,'#f4b7c9');ctx.restore()}
-else if(t.kind==='cat'||t.kind==='fox'){ctx.fillStyle=base;ctx.beginPath();ctx.moveTo(-25,-13);ctx.lineTo(-23,-40);ctx.lineTo(-4,-27);ctx.lineTo(4,-27);ctx.lineTo(23,-40);ctx.lineTo(25,-13);ctx.fill();ctx.fillStyle='#f4a7b6';ctx.beginPath();ctx.moveTo(-19,-23);ctx.lineTo(-19,-33);ctx.lineTo(-10,-26);ctx.moveTo(19,-23);ctx.lineTo(19,-33);ctx.lineTo(10,-26);ctx.fill()}
-else{ellipse(-20,-22,t.kind==='koala'?13:11,t.kind==='frog'?10:12,t.kind==='panda'?'#45414b':dark);ellipse(20,-22,t.kind==='koala'?13:11,t.kind==='frog'?10:12,t.kind==='panda'?'#45414b':dark);if(t.kind==='bear'||t.kind==='koala'){ellipse(-20,-22,6,7,'#eab4bc');ellipse(20,-22,6,7,'#eab4bc')}}
-// feet and arms behind head
-ellipse(-12,23,11,9,base);ellipse(12,23,11,9,base);ellipse(-24,8,9,14,t.kind==='panda'?'#47434e':base);ellipse(24,8,9,14,t.kind==='panda'?'#47434e':base);
-ellipse(0,9,23,24,base);ellipse(0,11,13,15,t.kind==='panda'?'#faf9f8':'#fff7ed');
-ellipse(0,-16,29,27,base);ctx.shadowBlur=0;ctx.shadowOffsetY=0;
-if(t.kind==='panda'){ellipse(-12,-19,9,12,'#45414b');ellipse(12,-19,9,12,'#45414b')}
-if(t.kind==='frog'){ellipse(-16,-38,10,10,base);ellipse(16,-38,10,10,base)}
-if(t.kind==='fox'){ellipse(-13,-2,13,10,'#fff5e9');ellipse(13,-2,13,10,'#fff5e9')}
-// embroidered eyes with glints
-for(const ex of [-12,12]){ellipse(ex,-18,3.8,4.8,'#393045');ellipse(ex-1.2,-20,1.35,1.65,'#ffffff')}
-if(t.kind==='pig'){ellipse(0,-5,11,8,'#ef91a8');ellipse(-4,-5,2,2,'#ba657e');ellipse(4,-5,2,2,'#ba657e')}
-else if(t.kind==='koala'){ellipse(0,-8,7,10,'#626071')}
-else{ellipse(0,-6,8,6,t.kind==='frog'?'#8acb95':'#fff3e8');ellipse(0,-8,3.5,2.8,'#765063');ctx.strokeStyle='#765063';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(0,-5);ctx.lineTo(0,-2);ctx.moveTo(0,-2);ctx.quadraticCurveTo(-4,2,-6,-1);ctx.moveTo(0,-2);ctx.quadraticCurveTo(4,2,6,-1);ctx.stroke()}
-ellipse(-21,-7,5,2.5,'#f4a9ba88');ellipse(21,-7,5,2.5,'#f4a9ba88');
-// plush seam, embroidered whiskers and highlights
-ctx.save();ctx.strokeStyle='#ffffff80';ctx.lineWidth=.9;ctx.setLineDash([2,3]);ctx.beginPath();ctx.ellipse(0,9,21,22,0,.12,Math.PI-.12);ctx.stroke();ctx.setLineDash([]);ctx.restore();
-if(t.kind==='cat'||t.kind==='fox'){ctx.strokeStyle='#8d6877';ctx.lineWidth=1.1;for(const side of [-1,1]){ctx.beginPath();ctx.moveTo(side*7,-5);ctx.lineTo(side*23,-8);ctx.moveTo(side*7,-2);ctx.lineTo(side*22,1);ctx.stroke()}}
-// stitched belly heart and soft specular light
-ctx.font='12px sans-serif';ctx.textAlign='center';ctx.fillStyle='#e994af';ctx.fillText(t.special?'★':'♥',0,17);if(t.special){ctx.font='bold 20px sans-serif';ctx.fillStyle='#f7a82c';ctx.fillText('♛',0,-48);ctx.font='bold 9px Kanit';ctx.fillStyle='#a16c23';ctx.fillText('JACKPOT',0,37)}ctx.save();ctx.globalAlpha=.18;ellipse(-11,-27,10,5,'white');ctx.restore();ctx.restore()}
+let plushClock=0;
+function plush(t,shadow=true){
+ const tm=plushClock||performance.now(),s=t.size||29,base=t.color||'#ffe2ed',accent=t.accent||'#e9a6bd';
+ const seed=(t.name||'').length*1.7+(t.x||0)*.015;
+ const bob=shadow?Math.sin(tm/410+seed)*1.5:0;
+ const blink=(tm/1000+seed*1.9)%5.6<.13;
+ ctx.save();ctx.translate(t.x,t.y+bob);ctx.rotate((t.tilt||0)+Math.sin(tm/820+seed)*.025);ctx.scale(s/30,s/30);
+ if(shadow){ctx.save();ctx.globalAlpha=.14;ellipse(0,32,26,5,'#5e456b');ctx.restore()}
+ if(t.special){ctx.shadowColor='#ffe16a';ctx.shadowBlur=18+6*Math.sin(tm/230)}
+ // fluffy curved tail, waving gently
+ ctx.save();ctx.strokeStyle=accent;ctx.lineWidth=11;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(18,17);ctx.bezierCurveTo(37,21,37,-4,29,-9+Math.sin(tm/330+seed)*4);ctx.stroke();ctx.strokeStyle='#ffffff77';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(22,19);ctx.quadraticCurveTo(34,15,32,3);ctx.stroke();ctx.restore();
+ // plush paws and round body
+ ellipse(-12,24,11,8,accent);ellipse(12,24,11,8,accent);
+ ellipse(-22,9,9,13,base);ellipse(22,9,9,13,base);
+ ellipse(0,9,23,24,base);ellipse(0,12,14,16,'#fff9f3');
+ // triangular cat ears with rounded points
+ ctx.fillStyle=base;ctx.beginPath();ctx.moveTo(-26,-13);ctx.quadraticCurveTo(-30,-46,-22,-43);ctx.lineTo(-4,-30);ctx.lineTo(4,-30);ctx.lineTo(22,-43);ctx.quadraticCurveTo(30,-46,26,-13);ctx.closePath();ctx.fill();
+ ctx.fillStyle='#f4a9c0';ctx.beginPath();ctx.moveTo(-22,-24);ctx.lineTo(-22,-37);ctx.lineTo(-12,-28);ctx.moveTo(22,-24);ctx.lineTo(22,-37);ctx.lineTo(12,-28);ctx.fill();
+ // soft head with sheen
+ ellipse(0,-16,28,26,base);
+ ctx.save();ctx.globalAlpha=.19;ellipse(-11,-28,11,6,'#fff');ctx.restore();
+ // markings, each cat gets a distinct character
+ if(t.pattern==='stripe'){for(const xx of [-10,0,10]){ctx.strokeStyle=accent;ctx.lineWidth=2.5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(xx,-39);ctx.lineTo(xx*.65,-33);ctx.stroke()}}
+ if(t.pattern==='star'){ctx.fillStyle=accent;ctx.font='12px sans-serif';ctx.textAlign='center';ctx.fillText('✦',0,-30)}
+ if(t.pattern==='flower'){ctx.font='13px sans-serif';ctx.fillStyle='#dc79aa';ctx.textAlign='center';ctx.fillText('✿',-19,-31)}
+ if(t.pattern==='heart'){ctx.font='10px sans-serif';ctx.fillStyle=accent;ctx.textAlign='center';ctx.fillText('♥',0,-32)}
+ // blinking embroidered eyes
+ for(const ex of [-12,12]){if(blink){ctx.strokeStyle='#4a394d';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(ex-4,-18);ctx.quadraticCurveTo(ex,-15,ex+4,-18);ctx.stroke()}else{ellipse(ex,-18,4.3,5.5,'#453447');ellipse(ex-1.4,-20,1.6,1.8,'#fff')}}
+ ellipse(-20,-8,6,3,'#f4a1b488');ellipse(20,-8,6,3,'#f4a1b488');
+ ellipse(0,-7,3.8,2.7,'#d78b9f');ctx.strokeStyle='#8c6374';ctx.lineWidth=1.3;ctx.beginPath();ctx.moveTo(0,-4);ctx.lineTo(0,-1);ctx.quadraticCurveTo(-4,3,-6,-1);ctx.moveTo(0,-1);ctx.quadraticCurveTo(4,3,6,-1);ctx.stroke();
+ for(const side of [-1,1]){ctx.strokeStyle='#a88a96';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(side*8,-5);ctx.lineTo(side*23,-8);ctx.moveTo(side*8,-2);ctx.lineTo(side*23,1);ctx.stroke()}
+ // bow and belly accessory
+ ellipse(-6,14,6,4,accent);ellipse(6,14,6,4,accent);ellipse(0,14,3.5,3.5,'#fff7fa');
+ ctx.save();ctx.strokeStyle='#ffffff90';ctx.setLineDash([2,3]);ctx.lineWidth=.8;ctx.beginPath();ctx.ellipse(0,10,21,22,0,.2,Math.PI-.2);ctx.stroke();ctx.restore();
+ if(t.special){ctx.shadowBlur=0;ctx.font='bold 21px sans-serif';ctx.fillStyle='#c58d28';ctx.textAlign='center';ctx.fillText('♛',0,-49);ctx.font='bold 9px Kanit';ctx.fillText('JACKPOT',0,39)}
+ ctx.restore();
+}
 let sway=0;function scene(t){const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#a9d9e9');g.addColorStop(.57,'#d9e7f0');g.addColorStop(1,'#f9c9dc');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
 ctx.fillStyle='#ffffff44';ctx.beginPath();ctx.moveTo(14,0);ctx.lineTo(73,0);ctx.lineTo(0,253);ctx.lineTo(0,115);ctx.fill();
 for(let i=0;i<22;i++){let px=(i*83+26)%W,py=(i*91+31)%312;ctx.fillStyle='#fff9';ctx.font=(i%4===0?17:11)+'px sans-serif';ctx.fillText(i%2?'✦':'✧',px,py)}
 rr(0,ground-6,W,67,0,'#e9b1d1');rr(0,ground-6,W,11,0,'#fff0f7');
 // physically visible prize hatch on left
 rr(8,ground+5,101,54,12,'#b977b0');rr(16,ground+12,85,39,9,'#5b3e6b');rr(22,ground+17,72,29,7,'#332d4f');ctx.font='bold 12px Kanit';ctx.fillStyle='#fff1fa';ctx.fillText('PRIZE ↓',33,ground+35);for(const h of hatchToys){ctx.save();ctx.beginPath();ctx.rect(20,ground+12,79,37);ctx.clip();plush({...h,x:58,y:ground+42,size:15,tilt:-.17},false);ctx.restore()}
-for(const toy of toys)if(!toy.taken&&toy!==grabbed&&!toy.falling)plush(toy);
+for(const toy of toys)if(!toy.taken&&!toy.inClaw&&!toy.falling&&toy!==activeToy)plush(toy);
 // The rail stays fixed; the suspended cable and claw sway like a pendulum.
 const clawX=x+sway;
 rr(12,8,W-24,8,4,'#faf6ff');rr(x-22,8,44,17,7,'#997ab7');rr(x-14,11,28,9,4,'#dfc9ee');ctx.strokeStyle='#785f91';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(x,24);ctx.lineTo(clawX,y);ctx.stroke();
 rr(clawX-26,y-8,52,22,9,'#a68ac5');rr(clawX-20,y-4,40,10,5,'#eadcf5');
 // animated claw opening and closing
 const spread=lerp(9,22,clawOpen);ctx.strokeStyle='#6b587e';ctx.lineWidth=5;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(clawX-12,y+11);ctx.lineTo(clawX-spread,y+31);ctx.lineTo(clawX-spread*.67,y+43);ctx.moveTo(clawX+12,y+11);ctx.lineTo(clawX+spread,y+31);ctx.lineTo(clawX+spread*.67,y+43);ctx.stroke();
-if(grabbed){grabbed.x=clawX;grabbed.y=y+73;grabbed.tilt=Math.sin(t/170)*.055;plush(grabbed,false)}
+if(grabbed){plush({...grabbed,x:clawX,y:y+73,tilt:Math.sin(t/170)*.055},false)}
 if(dropToy){ctx.save();ctx.beginPath();ctx.rect(18,0,85,H);ctx.clip();plush(dropToy,false);ctx.restore()}
 // side-mounted LED strips and specular highlights
 for(let i=0;i<11;i++){const glow=.45+.4*Math.sin(t/240+i*.8);ctx.save();ctx.globalAlpha=glow;ellipse(5,24+i*30,2.5,5,i%2?'#fff6c7':'#fff9ff');ellipse(W-5,24+i*30,2.5,5,i%2?'#fff6c7':'#fff9ff');ctx.restore()}
@@ -114,20 +238,42 @@ ctx.save();ctx.globalAlpha=.13;ctx.fillStyle='white';ctx.beginPath();ctx.moveTo(
 ctx.fillStyle='#ffffff26';ctx.beginPath();ctx.moveTo(W-39,0);ctx.lineTo(W-13,0);ctx.lineTo(W-13,H);ctx.lineTo(W-22,H);ctx.fill();
 }
 function celebrate(jackpot){const layer=$('confettiLayer');layer.replaceChildren();const colors=jackpot?['#ffe27a','#fff6bf','#ffb4d9','#fff']:['#ff9ecb','#d3a8ff','#fff1aa','#a8e8f3'];for(let i=0;i<(jackpot?90:42);i++){const el=document.createElement('i');el.className='confetti-piece';el.style.left=(Math.random()*100)+'%';el.style.background=colors[i%colors.length];el.style.setProperty('--duration',(2+Math.random()*2.2)+'s');el.style.setProperty('--drift',(Math.random()*240-120)+'px');el.style.setProperty('--rot',(Math.random()*360)+'deg');el.style.animationDelay=(Math.random()*.5)+'s';layer.appendChild(el)}setTimeout(()=>layer.replaceChildren(),5100)}
-function collectible(t){const badge=document.createElement('div');badge.className='prize'+(t.special?' grand-prize':'');const icon=document.createElement('canvas');icon.width=96;icon.height=96;const ic=icon.getContext('2d');const saved=ctx;const old=t; // draw a miniature plush on an independent canvas
+function collectible(t){const badge=document.createElement('div');badge.className='prize'+(t.special?' grand-prize':'');const icon=document.createElement('canvas');icon.width=96;icon.height=96;// Preview is rendered with the exact same artwork as the toy in the machine
 const name=document.createElement('small');name.textContent=t.special?'👑 JACKPOT':t.name;badge.append(icon,name);$('collection').appendChild(badge);
 // Reuse the main plush renderer by temporarily swapping the active drawing context via a dedicated renderer below.
 paintCollection(icon,t);}
-function paintCollection(canvasEl,t){const target=canvasEl.getContext('2d');target.clearRect(0,0,96,96);target.save();target.translate(48,47);const color=t.color;target.fillStyle=color;target.shadowColor='#8c59714d';target.shadowBlur=5;
-function e(a,b,rx,ry,c){target.fillStyle=c;target.beginPath();target.ellipse(a,b,rx,ry,0,0,Math.PI*2);target.fill()}
-if(t.kind==='bunny'){e(-13,-26,7,20,color);e(13,-26,7,20,color);e(-13,-26,3,12,'#f5b0c6');e(13,-26,3,12,'#f5b0c6')}
-else if(t.kind==='cat'||t.kind==='fox'){target.beginPath();target.moveTo(-23,-9);target.lineTo(-23,-33);target.lineTo(-5,-22);target.lineTo(5,-22);target.lineTo(23,-33);target.lineTo(23,-9);target.fill()}
-else{e(-18,-19,11,12,color);e(18,-19,11,12,color)}
-e(-13,19,10,9,color);e(13,19,10,9,color);e(0,8,23,23,color);e(0,9,12,14,'#fff4ed');e(0,-12,27,25,color);target.shadowBlur=0;
-if(t.kind==='panda'){e(-11,-15,9,11,'#49434f');e(11,-15,9,11,'#49434f')}
-for(const a of [-11,11]){e(a,-15,3.6,4.4,'#443447');e(a-1,-17,1.2,1.5,'white')}
-e(-19,-3,5,3,'#f4b0bf');e(19,-3,5,3,'#f4b0bf');e(0,-3,6,5,'#fff3ec');e(0,-5,3,2,'#765063');target.font='12px sans-serif';target.textAlign='center';target.fillStyle='#df779f';target.fillText('♥',0,18);if(t.special){target.font='25px sans-serif';target.fillText('♛',0,-33)}target.restore()}
-function result(win,t){if(win)celebrate(!!t.special);$('overlay').classList.add('show');$('resultEmoji').textContent=win?t.emoji:'💫';$('resultTitle').textContent=win?(t.special?'🎉 รางวัลใหญ่ JACKPOT!':'คีบสำเร็จ!'):'เกือบแล้ว!';$('resultText').textContent=win?(t.special?'สุดยอด! คุณได้รับตุ๊กตาพิเศษ '+t.name+' ✨':'คุณได้รับ'+t.name+'เข้าคอลเลกชัน ♡'):'ยังจับตุ๊กตาไม่ได้ ลองเล็งใหม่อีกครั้งนะ!';$('continue').textContent=coins>0?'เล่นต่อ ✦':'ปิดหน้าต่าง ✦';$('status').textContent=win?'WINNER!':'ลองอีกครั้ง'}
+// Use exactly the same plush renderer for the machine, pickup preview and collection.
+function paintCollection(canvasEl,t){
+  const original=ctx;
+  const target=canvasEl.getContext('2d');
+  if(!target)return;
+  try{
+    target.clearRect(0,0,canvasEl.width,canvasEl.height);
+    target.save();
+    target.translate(canvasEl.width/2,canvasEl.height*.56);
+    const scale=Math.min(canvasEl.width/100,canvasEl.height/110);
+    target.scale(scale,scale);
+    ctx=target;
+    plush({...t,x:0,y:0,size:30,tilt:0},false);
+    target.restore();
+  }finally{ctx=original;}
+}
+function showActualPrize(t){
+  const preview=$('realPrizePreview');
+  const emoji=$('resultEmoji');
+  if(t){
+    paintCollection(preview,t);
+    preview.hidden=false;
+    emoji.style.display='none';
+    preview.classList.remove('prize-reveal');
+    void preview.offsetWidth;
+    preview.classList.add('prize-reveal');
+  }else{
+    preview.hidden=true;
+    emoji.style.display='';
+  }
+}
+function result(win,t){showActualPrize(win?t:null);if(win)celebrate(!!t.special);$('overlay').classList.add('show');$('resultEmoji').textContent=win?t.emoji:'💫';$('resultTitle').textContent=win?(t.special?'🎉 รางวัลใหญ่ JACKPOT!':'คีบสำเร็จ!'):'เกือบแล้ว!';$('resultText').textContent=win?(t.special?'สุดยอด! คุณได้รับแมวพิเศษ '+t.name+' ✨':'คุณได้รับ'+t.name+'เข้าคอลเลกชัน ♡'):'ยังจับตุ๊กตาไม่ได้ ลองเล็งใหม่อีกครั้งนะ!';$('continue').textContent=coins>0?'เล่นต่อ ✦':'ปิดหน้าต่าง ✦';$('status').textContent=win?'WINNER!':'ลองอีกครั้ง'}
 // Original procedural arcade soundtrack: no external audio files or third-party services.
 // Dedicated arcade backing track: HTMLAudioElement is more reliable on iOS Safari than timer-based oscillator music.
 const arcadeTrack=document.createElement('audio');
@@ -172,45 +318,168 @@ const audio=(()=>{
  document.addEventListener('visibilitychange',()=>{if(document.hidden){if(context&&context.state==='running')context.suspend().catch(()=>{})}else if(enabled&&context)context.resume().catch(()=>{})});
  return {start,fx,toggle,enableAndStart:()=>{enabled=true;return start()},isEnabled:()=>enabled};
 })();
+
+let coinAnimating=false,winLightTimer=null;
+function flashWinLights(jackpot){
+ const machine=document.querySelector('.machine');machine.classList.remove('win-lights','win-lights-jackpot');
+ void machine.offsetWidth;machine.classList.add(jackpot?'win-lights-jackpot':'win-lights');
+ if(winLightTimer)clearTimeout(winLightTimer);
+ winLightTimer=setTimeout(()=>machine.classList.remove('win-lights','win-lights-jackpot'),jackpot?4200:2100);
+}
+function insertAnimatedCoins(first){
+ if(coinAnimating||phase!=='idle')return;
+ coinAnimating=true;
+ const layer=$('coinAnimation');layer.classList.remove('active');void layer.offsetWidth;layer.classList.add('active');
+ $('insertCoin').disabled=true;$('status').textContent='🪙 หยอดเหรียญ...';
+ soundAction('coin');
+ setTimeout(()=>{
+  coins+=chosenCoins;coinAnimating=false;layer.classList.remove('active');stats();
+  $('status').textContent='พร้อมเล่น!';msg(first?'✨ เริ่มเกมแล้ว! เล่นได้ '+chosenCoins+' ครั้ง ลุ้น JACKPOT!':'🪙 หยอดเหรียญสำเร็จ! เพิ่มอีก '+chosenCoins+' ครั้ง');
+  if(!first)shuffleToys();roundWins=0;arcadeUI();
+ },1450);
+}
+
+
+const arcadeExtraKey='yanisa_arcade_extra_v1';let arcadeExtra={tickets:0,bow:false,glow:false,plays:0,wins:0,perCab:{}};
+try{const saved=JSON.parse(localStorage.getItem(arcadeExtraKey)||'null');if(saved&&typeof saved==='object')arcadeExtra={...arcadeExtra,...saved,perCab:saved.perCab||{}}}catch(e){}
+function saveArcadeExtra(){try{localStorage.setItem(arcadeExtraKey,JSON.stringify(arcadeExtra))}catch(e){}}
+function renderArcadeExtra(){const a=arcadeExtra;$('ticketInfo').textContent='🎟️ ตั๋วสะสม '+a.tickets+' ใบ'+(a.bow?' · 🎀 โบว์':'')+(a.glow?' · ✨ ไฟพิเศษ':'');$('shopBow').disabled=a.bow||a.tickets<20;$('shopGlow').disabled=a.glow||a.tickets<35;const rate=a.plays?Math.round(a.wins/a.plays*100):0;$('arcadeStats').textContent='📊 คีบทั้งหมด '+a.plays+' ครั้ง · สำเร็จ '+a.wins+' ครั้ง · อัตราสำเร็จ '+rate+'% · ตู้ '+currentCabinet.name+' '+((a.perCab[currentCabinet.id]||{}).wins||0)+' รางวัล';document.body.classList.toggle('special-led',a.glow)}
+function purchaseArcade(type,cost){if(arcadeExtra[type]||arcadeExtra.tickets<cost)return;arcadeExtra.tickets-=cost;arcadeExtra[type]=true;saveArcadeExtra();renderArcadeExtra();msg(type==='bow'?'🎀 ปลดล็อกโบว์แมวแล้ว!':'✨ ปลดล็อกไฟพิเศษแล้ว!');}
+$('shopBow').addEventListener('click',()=>purchaseArcade('bow',20));$('shopGlow').addEventListener('click',()=>purchaseArcade('glow',35));
+function roomRender(){const root=$('roomMachines');root.replaceChildren();for(const cab of cabinets){const b=document.createElement('button');b.type='button';b.className='room-machine'+(cab.id===currentCabinet.id?' selected':'');b.style.setProperty('--cab1',cab.a);b.style.setProperty('--cab2',cab.b);const title=document.createElement('strong');title.textContent=cab.name;const glass=document.createElement('div');glass.className='room-glass';glass.textContent=cab.icon;const sub=document.createElement('small');sub.textContent=cab.desc;const door=document.createElement('div');door.className='room-door';b.append(title,glass,sub,door);b.addEventListener('click',()=>{selectCabinet(cab.id);roomRender()});root.appendChild(b)}$('roomSelected').textContent='🎮 ตู้ที่เลือก: '+currentCabinet.name}
+function openArcadeRoom(){if(phase!=='idle'||coinAnimating||waitingPrizes.length){msg('ต้องรอหัวคีบหยุดและรับรางวัลก่อนเข้าห้อง Arcade');return}roomRender();$('arcadeRoom').classList.add('open')}
+$('roomFromStart').addEventListener('click',openArcadeRoom);$('openRoom').addEventListener('click',openArcadeRoom);$('roomBack').addEventListener('click',()=>{$('arcadeRoom').classList.remove('open');renderArcadeExtra()});
+const originalFinish=finish;finish=function(){const successBefore=success,cab=currentCabinet.id;arcadeExtra.plays++;const c=arcadeExtra.perCab[cab]||(arcadeExtra.perCab[cab]={plays:0,wins:0});c.plays++;if(successBefore){arcadeExtra.wins++;c.wins++;arcadeExtra.tickets+=activeToy&&activeToy.special?12:activeToy&&activeToy.rarity==='Epic'?6:3;}saveArcadeExtra();originalFinish();saveGameSession();renderArcadeExtra();if(successBefore)document.querySelector('.machine').classList.add('reward-flash');setTimeout(()=>document.querySelector('.machine').classList.remove('reward-flash'),2500)};
+renderArcadeExtra();
+$('coinCount').addEventListener('change',e=>updateCoinSelection(e.target.value));$('startCoinCount').addEventListener('change',e=>updateCoinSelection(e.target.value));renderCabinetButtons();updateCoinSelection(1);
 $('startGame').addEventListener('click',()=>{
  $('startScreen').classList.add('hidden');
+ insertAnimatedCoins(true);
  // Both audio systems are unlocked immediately inside the user's tap handler.
  const backing=playBacking();audio.enableAndStart().then(ok=>{if(ok)audio.fx('coin')});
  backing.then(ok=>{updateMusicLabel(ok);if(!ok)msg('เสียงเพลงยังไม่เริ่ม: แตะปุ่ม 🎵 อีกครั้ง และตรวจสอบระดับเสียงสื่อของ iPhone')});
- msg('เริ่มเกมแล้ว! มี 6 ครั้ง ลุ้นตุ๊กตาพิเศษ JACKPOT ✨');
+ msg('🪙 กำลังหยอดเหรียญ...');
 });
 $('soundToggle').addEventListener('click',()=>{
  if(musicWanted){stopBacking();if(audio.isEnabled())audio.toggle();updateMusicLabel(false);msg('ปิดเพลงแล้ว — แตะปุ่มเพลงเพื่อเปิดอีกครั้ง');return}
  const backing=playBacking();if(!audio.isEnabled())audio.enableAndStart();
- backing.then(ok=>{updateMusicLabel(ok);msg(ok?'🎵 เปิดเพลง Arcade แล้ว! หากไม่ได้ยิน ให้เพิ่มระดับเสียงสื่อของ iPhone':'เปิดเพลงไม่สำเร็จ กรุณาลองใน Safari และแตะปุ่มเปิดเพลงอีกครั้ง')});
+ backing.then(ok=>{updateMusicLabel(ok);audio.fx('coin');msg(ok?'🎵 เปิดเพลง Arcade แล้ว! หากไม่ได้ยิน ให้เพิ่มระดับเสียงสื่อของ iPhone':'เปิดเพลงไม่สำเร็จ กรุณาลองใน Safari และแตะปุ่มเปิดเพลงอีกครั้ง')});
 });
 function soundAction(name){audio.fx(name)}
 
 function change(p){phase=p;elapsed=0;const effects={close:'close',up:'up',travel:'travel',open:'open',fall:'fall'};if(effects[p])audio.fx(effects[p])}
-function startDrop(){if(phase!=='idle'||coins<=0){if(coins<=0)soundAction('limit');return}soundAction('down');coins--;tries++;stats();move=0;clawOpen=1;grabbed=null;dropToy=null;change('down');msg('หัวคีบกำลังแกว่ง! จับจังหวะให้ตรงตุ๊กตา ✨');$('status').textContent='กำลังคีบ…'}
-function updatePickup(){const n=waitingPrizes.length;$('waiting').textContent='('+n+')';$('pickup').disabled=n===0;$('pickup').classList.toggle('ready',n>0);$('pickupNote').textContent=n?'มีตุ๊กตารออยู่ในช่องรับรางวัล '+n+' ตัว — กดปุ่มเพื่อหยิบ':'คีบตุ๊กตาให้สำเร็จก่อน แล้วกดรับรางวัลที่ช่องด้านล่าง'}function finish(){const won=success,t=activeToy;if(won){audio.fx(t.special?'jackpot':'pickup');t.taken=true;waitingPrizes.push({...t});hatchToys.push({...t});wins++;updatePickup()}grabbed=null;dropToy=null;activeToy=null;success=false;x=210;y=TOP;clawOpen=1;change('idle');stats();if(!won)result(false,t);if(toys.every(t=>t.taken))populate();else if(!flyingToy)shuffleToys();msg(coins===0?'ครบ 6 ครั้งแล้ว กรุณาหยอดเหรียญเพิ่ม หรือเริ่มเกมใหม่ (ปุ่มรีเฟรช)':won?'ตุ๊กตาอยู่ในช่อง PRIZE แล้ว! กดปุ่มหยิบตุ๊กตา 🎁':'ลองขยับให้ตรงกลางตุ๊กตามากขึ้นนะ');$('status').textContent=won?'รอรับรางวัล 🎁':'พร้อมเล่น!'}
-function step(dt){animateShuffle(dt);sway=Math.sin(performance.now()/365)*((phase==='down'||phase==='close')?15:phase==='idle'?11:7)+Math.sin(performance.now()/810)*3;if(phase==='idle'){x=clamp(x+move*dt*.23,35,W-35);return}elapsed+=dt;
+
+// Persistent arcade progression (stored locally on this device only).
+const STORE='yanisa_arcade_deluxe_v2';let progress={album:{},daily:'',spins:0,missions:0};
+try{const saved=JSON.parse(localStorage.getItem(STORE)||'null');if(saved&&typeof saved==='object')progress={...progress,...saved,album:saved.album||{}}}catch(e){}
+const saveProgress=()=>{try{localStorage.setItem(STORE,JSON.stringify(progress))}catch(e){}};
+let difficulty=0,powerPending=false,powerStart=0,powerStrength=0.7,rainbowUntil=0,roundWins=0;
+const difficultyNames=['ปกติ','ท้าทาย','โปร'];
+function rarityOf(t){return t.special?'Legendary':t.rarity||'Common'}
+function rarityStyle(r){return r.toLowerCase()}
+function decorateRarity(){for(const t of toys){t.rarity=t.special?'Legendary':(Math.random()<.08?'Epic':Math.random()<.24?'Rare':'Common')}}
+function arcadeUI(){const total=Object.values(progress.album).reduce((n,v)=>n+(v.count||0),0);$('wheelBtn').disabled=progress.spins<=0;$('wheelBtn').textContent='🎡 วงล้อโบนัส ('+progress.spins+')';$('difficultyBtn').textContent='🎚️ ระดับ: '+difficultyNames[difficulty];$('dailyBtn').disabled=progress.daily===new Date().toLocaleDateString('en-CA');$('dailyText').textContent=$('dailyBtn').disabled?'🎉 รับโบนัสวันนี้แล้ว':'🎉 รับโบนัสรายวันได้ 1 ครั้ง';$('missionText').textContent='🎯 ภารกิจ: คีบให้ได้ 3 ตัวในรอบเดียว ('+Math.min(roundWins,3)+'/3) · สำเร็จแล้ว '+progress.missions+' ครั้ง';$('rarityHint').textContent='🎁 Common · 💎 Rare · 💜 Epic · 👑 Legendary | สะสม '+total+' ตัว';$('albumContents').innerHTML='';const entries=Object.values(progress.album);if(!entries.length){$('albumContents').textContent='ยังไม่มีตุ๊กตา ลองคีบแล้วกดหยิบจากช่อง PRIZE';return}for(const item of entries){const row=document.createElement('p');row.textContent=(item.emoji||'🧸')+' '+item.name+' · '+item.rarity+' × '+item.count;$('albumContents').appendChild(row)}}
+function earnedPrize(t){const r=rarityOf(t),key=t.name+'_'+r;const v=progress.album[key]||{name:t.name,emoji:t.emoji,rarity:r,count:0};v.count++;progress.album[key]=v;saveProgress();arcadeUI()}
+function arcadeWon(t){roundWins++;if(roundWins===3){progress.spins++;progress.missions++;msg('🎯 ภารกิจสำเร็จ! ได้หมุนวงล้อโบนัส 1 ครั้ง');}if(t.special||Math.random()<.22){rainbowUntil=performance.now()+15000;document.body.classList.add('rainbow-mode');msg('🌈 RAINBOW TIME! 15 วินาที หัวคีบแกว่งน้อยลง!')}saveProgress();arcadeUI()}
+function stopPower(){if(!powerPending)return false;powerPending=false;$('powerPanel').hidden=true;const pos=(Math.sin((performance.now()-powerStart)/360)+1)/2;powerStrength=Math.max(0,1-Math.abs(pos-.5)*2);$('powerInfo').textContent='พลังคีบ '+Math.round(powerStrength*100)+'%';return true}
+$('difficultyBtn').addEventListener('click',()=>{if(phase!=='idle')return;difficulty=(difficulty+1)%3;arcadeUI();msg('เปลี่ยนระดับความยากเป็น '+difficultyNames[difficulty])});
+$('albumBtn').addEventListener('click',()=>{$('albumPanel').hidden=!$('albumPanel').hidden;arcadeUI()});
+$('dailyBtn').addEventListener('click',()=>{const today=new Date().toLocaleDateString('en-CA');if(progress.daily===today)return;progress.daily=today;progress.spins++;saveProgress();arcadeUI();audio.fx('coin');msg('🎁 รับโบนัสรายวัน! ได้สิทธิ์หมุนวงล้อ 1 ครั้ง')});
+$('wheelBtn').addEventListener('click',()=>{if(progress.spins<=0||phase!=='idle')return;progress.spins--;const n=Math.random();let reward;if(n<.45){coins+=2;reward='🪙 +2 โอกาสคีบ'}else if(n<.8){coins+=1;reward='🪙 +1 โอกาสคีบ'}else{rainbowUntil=performance.now()+15000;document.body.classList.add('rainbow-mode');reward='🌈 Rainbow Time 15 วินาที'}saveProgress();stats();arcadeUI();$('wheelPanel').hidden=false;$('wheelResult').textContent='🎡 คุณได้รับ '+reward;audio.fx('jackpot')});
+arcadeUI();
+function startDrop(){if(phase==='idle'&&coins>0&&!powerPending){powerPending=true;powerStart=performance.now();$('powerPanel').hidden=false;msg('⚡ กดคีบอีกครั้งเมื่อเข็มอยู่ตรงกลางสีทอง!');return}if(powerPending)stopPower();if(phase!=='idle'||coins<=0){if(coins<=0){soundAction('limit');msg('🪙 กรุณาหยอดเหรียญก่อนคีบ!')}return}soundAction('down');coins--;tries++;stats();move=0;clawOpen=1;grabbed=null;dropToy=null;change('down');msg('หัวคีบกำลังแกว่ง! จับจังหวะให้ตรงตุ๊กตา ✨');$('status').textContent='กำลังคีบ…'}
+function updatePickup(){const n=waitingPrizes.length;$('waiting').textContent='('+n+')';$('pickup').disabled=n===0;$('pickup').classList.toggle('ready',n>0);$('pickupNote').textContent=n?'มีตุ๊กตารออยู่ในช่องรับรางวัล '+n+' ตัว — กดปุ่มเพื่อหยิบ':'คีบตุ๊กตาให้สำเร็จก่อน แล้วกดรับรางวัลที่ช่องด้านล่าง'}let score=0,streak=0;function scoreDisplay(){const el=$('arcadeScore');el.textContent='⭐ คะแนน '+score.toLocaleString()+' · 🔥 คอมโบ '+streak;el.classList.remove('pulse');void el.offsetWidth;el.classList.add('pulse')}function finish(){const won=success,t=activeToy;if(won){arcadeWon(t);flashWinLights(!!t.special);streak++;const gained=(t.special?1000:100)*Math.min(streak,5);score+=gained;scoreDisplay();if(t.special){const machine=document.querySelector('.machine');machine.classList.add('jackpot-flash');setTimeout(()=>machine.classList.remove('jackpot-flash'),2600)}t.inClaw=false;t.falling=false;audio.fx(t.special?'jackpot':'pickup');t.taken=true;waitingPrizes.push({...t});hatchToys.push({...t});wins++;updatePickup()}if(!won){streak=0;scoreDisplay()}grabbed=null;dropToy=null;activeToy=null;success=false;x=210;y=TOP;clawOpen=1;change('idle');stats();if(!won)result(false,t);if(toys.every(t=>t.taken)){populate();decorateRarity();}else if(!flyingToy)shuffleToys();msg(coins===0?'โอกาสคีบหมดแล้ว กรุณาหยอดเหรียญเพิ่ม หรือเริ่มเกมใหม่ (ปุ่มรีเฟรช)':won?'ตุ๊กตาอยู่ในช่อง PRIZE แล้ว! กดปุ่มหยิบตุ๊กตา 🎁':'ลองขยับให้ตรงกลางตุ๊กตามากขึ้นนะ');$('status').textContent=won?'รอรับรางวัล 🎁':'พร้อมเล่น!'}
+function step(dt){animateShuffle(dt);sway=(Math.sin(performance.now()/365)*((phase==='down'||phase==='close')?15:phase==='idle'?11:7)+Math.sin(performance.now()/810)*3)*(performance.now()<rainbowUntil?.45:1)*(1+difficulty*.25);if(rainbowUntil&&performance.now()>rainbowUntil){rainbowUntil=0;document.body.classList.remove('rainbow-mode')}$('modeText').textContent=rainbowUntil?'🌈 Rainbow Time เหลือ '+Math.ceil(Math.max(0,rainbowUntil-performance.now())/1000)+' วินาที':'🌈 Rainbow Time: รอลุ้นโบนัส';if(powerPending)$('powerMarker').style.left=((Math.sin((performance.now()-powerStart)/360)+1)*49)+'%';if(phase==='idle'){x=clamp(x+move*dt*.23,35,W-35);return}elapsed+=dt;
 if(phase==='down'){y=Math.min(ground-106,y+dt*.22);if(y>=ground-106)change('close')}
-else if(phase==='close'){clawOpen=clamp(1-elapsed/450,0,1);if(elapsed>=520){let c=toys.filter(t=>!t.taken).map(t=>({t,d:Math.abs(t.x-(x+sway))+Math.abs(t.y-(y+73))*.12})).sort((a,b)=>a.d-b.d)[0];success=!!(c&&Math.abs(c.t.x-(x+sway))<29&&Math.random()<.82);activeToy=success?c.t:null;if(success){audio.fx('grab');grabbed=c.t;msg('จับได้แล้ว! กำลังยกขึ้น…')}else {audio.fx('miss');msg('ยังจับไม่ได้ กำลังยกหัวคีบ…')};change('up')}}
+else if(phase==='close'){clawOpen=clamp(1-elapsed/450,0,1);if(elapsed>=520){let c=toys.filter(t=>!t.taken).map(t=>({t,d:Math.abs(t.x-(x+sway))+Math.abs(t.y-(y+73))*.12})).sort((a,b)=>a.d-b.d)[0];success=!!(c&&Math.abs(c.t.x-(x+sway))<(29-difficulty*2)&&Math.random()<Math.min(.96,(c.t.special?.56:c.t.rarity==='Epic'?.66:c.t.rarity==='Rare'?.76:.88)*(0.55+powerStrength*.65)-difficulty*.10+(performance.now()<rainbowUntil?.18:0)));activeToy=success?c.t:null;if(success){audio.fx('grab');grabbed=c.t;grabbed.inClaw=true;msg('จับได้แล้ว! กำลังยกขึ้น…')}else {audio.fx('miss');msg('ยังจับไม่ได้ กำลังยกหัวคีบ…')};change('up')}}
 else if(phase==='up'){
 if(grabbed&&elapsed>380&&Math.random()<dt*(grabbed.special?.000085:.00013)){
- const t=grabbed;grabbed=null;success=false;activeToy=null;
+ const t=grabbed;grabbed=null;t.inClaw=false;success=false;activeToy=null;
  flyingToy={...t,x:x+sway,y:y+73,vy:0,spin:0,source:t};t.falling=true;
  audio.fx('miss');msg('โอ๊ะ! ตุ๊กตาหลุดจากก้ามคีบระหว่างยก!');
 }
 y=Math.max(TOP,y-dt*.23);if(y<=TOP){change('travel');msg(success?'กำลังพาตุ๊กตาไปช่อง PRIZE… ♡':'กำลังกลับไปที่ช่องรับรางวัล…')}}
 else if(phase==='travel'){x=Math.max(HOME,x-dt*.13);if(x<=HOME){change('pause');msg('ถึงช่องรับรางวัลแล้ว…')}}
-else if(phase==='pause'){if(elapsed>430){if(success&&grabbed){dropToy={...grabbed,x:HOME,y:grabbed.y,tilt:0};grabbed=null;dropV=0}change('open')}}
+else if(phase==='pause'){if(elapsed>430){if(success&&grabbed){dropToy={...grabbed,x:HOME+sway,y:y+73,tilt:0};grabbed.inClaw=false;grabbed.falling=true;grabbed=null;dropV=0}change('open')}}
 else if(phase==='open'){clawOpen=clamp(elapsed/420,0,1);if(elapsed>400){if(success&&dropToy){change('fall');msg('ปล่อยตุ๊กตาลงช่อง PRIZE! 🎁')}else change('finishwait')}}
 else if(phase==='fall'){dropV=Math.min(0.22,dropV+dt*.00022);dropToy.y+=dropV*dt;dropToy.tilt+=dt*.0009;if(dropToy.y>=ground+30){audio.fx('land');dropToy=null;change('finishwait')}}
 else if(phase==='finishwait'){if(elapsed>320)finish()}}
-function frame(t){const dt=Math.min(t-last||16,45);last=t;step(dt);
+function frame(t){plushClock=t;const dt=Math.min(t-last||16,45);last=t;step(dt);
 if(flyingToy){flyingToy.vy=Math.min(.48,flyingToy.vy+dt*.00085);flyingToy.y+=flyingToy.vy*dt;flyingToy.spin+=dt*.003;if(flyingToy.y>=ground-29){flyingToy.source.falling=false;flyingToy.source.x=clamp(flyingToy.x,32,W-32);flyingToy.source.y=ground-29;flyingToy=null;audio.fx('land')}}
 scene(t);if(flyingToy)plush({...flyingToy,tilt:flyingToy.spin},false);requestAnimationFrame(frame)}
 function setMove(dir){if(phase==='idle'){move=dir;if(dir)soundAction('move')}}
 for(const [id,dir] of [['left',-1],['right',1]]){const b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);setMove(dir);b.classList.add('active')});for(const ev of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(ev,()=>{move=0;b.classList.remove('active')})}
 window.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();if(e.repeat&&e.code==='Space')return;if(e.code==='ArrowLeft')setMove(-1);if(e.code==='ArrowRight')setMove(1);if(e.code==='Space')startDrop()});window.addEventListener('keyup',e=>{if((e.code==='ArrowLeft'&&move===-1)||(e.code==='ArrowRight'&&move===1))move=0});window.addEventListener('blur',()=>move=0);
-$('drop').addEventListener('click',startDrop);$('pickup').addEventListener('click',()=>{if(!waitingPrizes.length||phase!=='idle')return;const t=waitingPrizes.shift();soundAction(t.special?'jackpot':'pickup');hatchToys.shift();collectible(t);updatePickup();result(true,t);msg('หยิบ'+t.name+'จากช่องรับรางวัลแล้ว! ♡')});$('continue').addEventListener('click',()=>{$('overlay').classList.remove('show');if(coins===0)msg('ครบ 6 ครั้งแล้ว กรุณาหยอดเหรียญเพิ่ม หรือเริ่มเกมใหม่ (ปุ่มรีเฟรช)');$('status').textContent='พร้อมเล่น!'});
-$('insertCoin').addEventListener('click',()=>{if(phase!=='idle'||coins>0)return;soundAction('coin');coins=6;stats();$('status').textContent='พร้อมเล่น!';msg('หยอดเหรียญแล้ว! คีบได้อีก 6 ครั้ง 🪙');shuffleToys()});$('reset').addEventListener('click',()=>{if(phase!=='idle')return;if(!confirm('รีเฟรชเพื่อเริ่มเกมใหม่? เหรียญจะกลับเป็น 6 ครั้ง และสุ่มตำแหน่งตุ๊กตาใหม่ทั้งหมด'))return;soundAction('reset');coins=6;wins=tries=0;grabbed=null;dropToy=null;waitingPrizes=[];hatchToys=[];flyingToy=null;updatePickup();x=210;y=TOP;clawOpen=1;populate();$('collection').replaceChildren();$('overlay').classList.remove('show');$('status').textContent='พร้อมเล่น!';msg('เริ่มใหม่แล้ว! เลือกตุ๊กตาที่ชอบได้เลย');stats()});populate();stats();updatePickup();requestAnimationFrame(frame);
+$('drop').addEventListener('click',startDrop);$('pickup').addEventListener('click',()=>{if(!waitingPrizes.length||phase!=='idle')return;const t=waitingPrizes.shift();soundAction(t.special?'jackpot':'pickup');hatchToys.shift();collectible(t);earnedPrize(t);updatePickup();saveGameSession();result(true,t);msg('หยิบ'+t.name+' ['+rarityOf(t)+'] จากช่องรับรางวัลแล้ว! ♡')});$('continue').addEventListener('click',()=>{$('overlay').classList.remove('show');if(coins===0)msg('โอกาสคีบหมดแล้ว กรุณาหยอดเหรียญเพิ่ม หรือเริ่มเกมใหม่ (ปุ่มรีเฟรช)');$('status').textContent='พร้อมเล่น!'});
+$('insertCoin').addEventListener('click',()=>{if(phase!=='idle'||coinAnimating)return;insertAnimatedCoins(false)});$('reset').addEventListener('click',()=>{if(phase!=='idle')return;if(!confirm('เริ่มเกมใหม่? คะแนนและตุ๊กตาจะรีเซ็ต และต้องหยอดเหรียญก่อนเล่น'))return;soundAction('reset');coins=0;wins=tries=0;score=streak=0;scoreDisplay();grabbed=null;dropToy=null;waitingPrizes=[];hatchToys=[];flyingToy=null;updatePickup();x=210;y=TOP;clawOpen=1;roundWins=0;powerPending=false;$('powerPanel').hidden=true;populate();decorateRarity();arcadeUI();$('collection').replaceChildren();$('overlay').classList.remove('show');$('status').textContent='พร้อมเล่น!';msg('เริ่มใหม่แล้ว! กรุณาหยอดเหรียญก่อนเล่น 🪙');stats()});populate();decorateRarity();restoreGameSession();stats();scoreDisplay();updatePickup();arcadeUI();requestAnimationFrame(frame);
+})();
+</script><section id="profileGate" aria-label="เลือกชื่อผู้เล่น"><div class="profile-card"><h2>🐱 เลือกผู้เล่น</h2><p>แต่ละชื่อมีเหรียญ ตุ๊กตา และความคืบหน้าของตัวเองในมือถือเครื่องนี้</p><div id="profileList"></div><label for="profileName">สร้างผู้เล่นใหม่</label><input id="profileName" maxlength="20" placeholder="พิมพ์ชื่อผู้เล่น" autocomplete="off"><button type="button" class="profile-action" id="createPlayer">➕ เริ่มเล่นด้วยชื่อนี้</button><div class="profile-error" id="profileError" role="status"></div></div></section><script>
+(()=>{'use strict';
+const KEYS=["yanisa_mobile_game_v1", "yanisa_arcade_extra_v1", "yanisa_arcade_deluxe_v2", "yanisa_mobile_plus_v1"];
+// Detect the actual keys in the existing game, including legacy names.
+const relevant=Object.keys(localStorage).filter(k=>k.startsWith('yanisa_')&&k!=='yanisa_player_profiles_v1');
+const tracked=[...new Set([...KEYS,...relevant])];
+const REG='yanisa_player_profiles_v1';
+let data;try{data=JSON.parse(localStorage.getItem(REG)||'null')}catch(e){}
+if(!data||!Array.isArray(data.players)){data={players:[],active:null};}
+const gate=document.getElementById('profileGate'),list=document.getElementById('profileList'),input=document.getElementById('profileName'),error=document.getElementById('profileError');
+function persist(){try{localStorage.setItem(REG,JSON.stringify(data))}catch(e){error.textContent='ไม่สามารถบันทึกข้อมูลได้ กรุณาตรวจสอบพื้นที่จัดเก็บ Safari'}}
+function snapshot(){const out={};for(const k of tracked){const v=localStorage.getItem(k);if(v!==null)out[k]=v}return out}
+function flush(){if(!data.active)return;const p=data.players.find(x=>x.id===data.active);if(p){p.state=snapshot();persist()}}
+function load(p){for(const k of tracked)localStorage.removeItem(k);for(const [k,v] of Object.entries(p.state||{}))localStorage.setItem(k,v);data.active=p.id;persist();location.reload()}
+function show(){list.replaceChildren();for(const p of data.players){const b=document.createElement('button');b.type='button';b.textContent='🐱 '+p.name+(p.id===data.active?'  ✓':'');b.addEventListener('click',()=>{if(p.id===data.active){gate.hidden=true;return}flush();load(p)});list.appendChild(b)}gate.hidden=false;}
+// Preserve progress from older single-player game as an initial named profile.
+if(!data.players.length){data.players.push({id:'legacy',name:'ผู้เล่นเดิม',state:snapshot()});data.active='legacy';persist()}
+const active=data.players.find(x=>x.id===data.active)||data.players[0];
+document.getElementById('activePlayer').textContent='🐱 ผู้เล่น: '+active.name;
+document.getElementById('switchPlayer').addEventListener('click',()=>{flush();show()});
+document.getElementById('createPlayer').addEventListener('click',()=>{const name=input.value.trim().replace(/\s+/g,' ');if(!name||name.length>20){error.textContent='กรุณากรอกชื่อ 1–20 ตัวอักษร';return}if(data.players.some(p=>p.name.toLocaleLowerCase()===name.toLocaleLowerCase())){error.textContent='มีชื่อนี้แล้ว กรุณาเลือกชื่อเดิมหรือใช้ชื่อใหม่';return}if(data.players.length>=20){error.textContent='สร้างผู้เล่นได้สูงสุด 20 คน';return}flush();const p={id:'p'+Date.now()+'_'+Math.random().toString(36).slice(2,7),name,state:{}};data.players.push(p);persist();load(p)});
+input.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('createPlayer').click()});
+window.addEventListener('pagehide',flush);document.addEventListener('visibilitychange',()=>{if(document.hidden)flush()});
+// Prompt on every fresh page opening; same player may continue by tapping their name.
+show();
+})();
+</script><nav class="mobile-nav" aria-label="เมนูเกมมือถือ"><button data-panel="home">🏠<br>หน้าแรก</button><button data-panel="pets">🐱<br>ห้องแมว</button><button data-panel="shop">🎟️<br>ร้านค้า</button><button data-panel="ranking">🏆<br>อันดับ</button><button data-panel="settings">⚙️<br>ข้อมูล</button></nav><div class="mobile-sheet" id="mobileSheet" role="dialog" aria-modal="true" aria-label="เมนูเกม"><div class="sheet-inner"><button class="close-sheet" id="closeMobileSheet">✕ ปิด</button><div id="mobileSheetBody"></div></div></div><script>
+(()=>{'use strict';
+const $m=id=>document.getElementById(id), sheet=$m('mobileSheet'), body=$m('mobileSheetBody');
+const EXTRA='yanisa_mobile_plus_v1',REG='yanisa_player_profiles_v1';
+let state={xp:0,level:1,avatar:'🐱',food:3,decor:[],claimed:'',petCount:0,photoCount:0};
+try{state={...state,...JSON.parse(localStorage.getItem(EXTRA)||'{}')}}catch(e){}
+function save(){try{localStorage.setItem(EXTRA,JSON.stringify(state))}catch(e){}}
+function profile(){try{const d=JSON.parse(localStorage.getItem(REG)||'{}');return d.players?.find(p=>p.id===d.active)?.name||'ผู้เล่น'}catch(e){return 'ผู้เล่น'}}
+function album(){try{return Object.values(JSON.parse(localStorage.getItem('yanisa_arcade_deluxe_v2')||'{}').album||{})}catch(e){return []}}
+function prizes(){return album().reduce((a,x)=>a+(Number(x.count)||0),0)}
+function extras(){try{return JSON.parse(localStorage.getItem('yanisa_arcade_extra_v1')||'{}')}catch(e){return {}}}
+function progress(){const n=prizes(),x=extras();return {n,tickets:Number(x.tickets)||0,plays:Number(x.plays)||0,wins:Number(x.wins)||0}}
+function levelUp(){const p=progress();state.xp=Math.max(state.xp,p.plays*10+p.wins*30);state.level=1+Math.floor(state.xp/100);save()}
+function close(){sheet.classList.remove('open')}
+function heading(t){body.replaceChildren();const h=document.createElement('h2');h.textContent=t;body.append(h)}
+function para(t){const p=document.createElement('p');p.textContent=t;body.append(p);return p}
+function action(label,fn){const b=document.createElement('button');b.textContent=label;b.addEventListener('click',fn);body.append(b);return b}
+function open(which){levelUp();const p=progress();heading(({home:'🏠 หน้าหลัก',pets:'🐱 ห้องเลี้ยงแมว',shop:'🎟️ ร้านค้า',ranking:'🏆 ตารางคะแนน',settings:'⚙️ ตั้งค่าและสำรองข้อมูล'})[which]);
+if(which==='home'){
+ para(state.avatar+' '+profile()+' · เลเวล '+state.level+' · XP '+state.xp+' · ตุ๊กตาสะสม '+p.n+' ตัว · ตั๋ว '+p.tickets+' ใบ');
+ action('🎮 กลับไปเล่นตู้คีบ',close);action('🎁 รับรางวัลประจำวัน',()=>{const today=new Date().toLocaleDateString('en-CA');if(state.claimed===today){alert('รับรางวัลวันนี้แล้ว');return}state.claimed=today;state.food+=2;save();alert('รับอาหารแมว +2 แล้ว 🐟');open('home')});
+ action('👤 เปลี่ยนชื่อผู้เล่น',()=>{close();$m('switchPlayer')?.click()});
+} else if(which==='pets'){
+ para('แมวที่คีบได้ '+p.n+' ตัว · อาหารแมว '+state.food+' ชิ้น · แตะที่แมวเพื่อเล่น');const room=document.createElement('div');room.className='pet-room';const a=album();if(!a.length)room.textContent='ยังไม่มีแมว ลองไปคีบแมวจากตู้ก่อนนะ';a.slice(0,12).forEach((cat,i)=>{const b=document.createElement('button');const c=document.createElement('span');c.className='mini-cat';c.textContent=cat.emoji||'🐱';b.append(c);b.title=cat.name||'แมว';b.addEventListener('click',()=>{c.textContent='😻';setTimeout(()=>c.textContent=cat.emoji||'🐱',750)});room.append(b)});body.append(room);
+ action('🐟 ให้อาหารแมว',()=>{if(!p.n){alert('คีบแมวก่อนนะ');return}if(state.food<1){alert('อาหารหมดแล้ว กลับมารับโบนัสวันถัดไป');return}state.food--;state.petCount++;save();alert('แมวอิ่มแล้ว! 😻');open('pets')});
+ para('ของตกแต่ง: '+(state.decor.join(' · ')||'ยังไม่มี'));
+} else if(which==='shop'){
+ para('ตั๋วสะสม '+p.tickets+' ใบ · ใช้ตั๋วที่ได้จากการคีบแลกของตกแต่ง');for(const [name,cost] of [['🛏️ เตียงแมว',10],['🧶 ลูกบอลไหมพรม',15],['🌈 พรมสายรุ้ง',20],['🎀 โบว์สีชมพู',25]])action(name+' · '+cost+' ตั๋ว',()=>{if(state.decor.includes(name)){alert('มีของชิ้นนี้แล้ว');return}const x=extras();if((x.tickets||0)<cost){alert('ตั๋วไม่เพียงพอ');return}x.tickets-=cost;localStorage.setItem('yanisa_arcade_extra_v1',JSON.stringify(x));state.decor.push(name);save();alert('แลกสำเร็จ!');open('shop')});
+} else if(which==='ranking'){
+ let d={};try{d=JSON.parse(localStorage.getItem(REG)||'{}')}catch(e){};const players=d.players||[];para('อันดับเฉพาะผู้เล่นบนอุปกรณ์นี้ ไม่ใช่อันดับออนไลน์');const ranking=players.map(x=>{let a={};try{a=JSON.parse(x.state?.['yanisa_arcade_extra_v1']||'{}')}catch(e){};if(x.id===d.active)a=extras();return {name:x.name,wins:Number(a.wins)||0,plays:Number(a.plays)||0}}).sort((a,b)=>b.wins-a.wins);ranking.forEach((x,i)=>para((i+1)+'. '+x.name+' — คีบสำเร็จ '+x.wins+' / '+x.plays+' ครั้ง'));
+} else if(which==='settings'){
+ para('บันทึกข้อมูลใน Safari ของเครื่องนี้ สามารถส่งออกไฟล์ JSON เพื่อสำรองหรือย้ายเครื่องได้');
+ action('📦 ส่งออกข้อมูลเกมทุกผู้เล่น',()=>{try{const data={format:'yanisa-arcade-backup',version:1,date:new Date().toISOString(),entries:{}};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k?.startsWith('yanisa_'))data.entries[k]=localStorage.getItem(k)}const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='yanisa-arcade-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),3000)}catch(e){alert('ส่งออกไม่สำเร็จ: '+e.message)}});
+ const input=document.createElement('input');input.type='file';input.accept='.json,application/json';input.style.display='block';input.style.margin='12px 0';body.append(input);action('📥 นำเข้าข้อมูลสำรอง',async()=>{const f=input.files?.[0];if(!f){alert('เลือกไฟล์ JSON ก่อน');return}try{const data=JSON.parse(await f.text());if(data.format!=='yanisa-arcade-backup'||data.version!==1||!data.entries||typeof data.entries!=='object')throw Error('รูปแบบไฟล์ไม่ถูกต้อง');if(!confirm('นำเข้าจะเขียนทับข้อมูลเกมบนเครื่องนี้ทั้งหมด ยืนยันหรือไม่?'))return;for(const [k,v] of Object.entries(data.entries)){if(k.startsWith('yanisa_')&&typeof v==='string')localStorage.setItem(k,v)}location.reload()}catch(e){alert('นำเข้าไม่สำเร็จ: '+e.message)}});
+ action('📸 ถ่ายภาพหน้าจอเกม',()=>{close();const canvas=document.querySelector('canvas');if(!canvas){alert('ไม่พบภาพเกม');return}try{const a=document.createElement('a');a.href=canvas.toDataURL('image/png');a.download='yanisa-cat-game.png';a.click();state.photoCount++;save()}catch(e){alert('ไม่สามารถบันทึกภาพได้')}});
+ para('เพิ่มไปยังหน้าจอโฮม iPhone: กดแชร์ใน Safari → เพิ่มไปยังหน้าจอโฮม');
+ action('🐱 เปลี่ยนรูปประจำตัว',()=>{const avatars=['🐱','😻','🐈','🐈‍⬛','👑','🌸'];state.avatar=avatars[(avatars.indexOf(state.avatar)+1)%avatars.length];save();alert('รูปประจำตัว: '+state.avatar)});
+}
+sheet.classList.add('open');}
+document.querySelectorAll('[data-panel]').forEach(b=>b.addEventListener('click',()=>open(b.dataset.panel)));$m('closeMobileSheet').addEventListener('click',close);sheet.addEventListener('click',e=>{if(e.target===sheet)close()});
+// Keep the current player's snapshot updated after every significant local save.
+window.addEventListener('pagehide',save);
 })();
 </script></body></html>
