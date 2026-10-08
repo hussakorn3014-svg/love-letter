@@ -1,196 +1,35 @@
-<!doctype html>
-<html lang="th">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>HBD Yanisa 🎂</title>
-<style>
-*{box-sizing:border-box}
-html,body{height:100%;margin:0}
-body{
-  overflow:hidden; display:grid; place-items:center;
-  background:radial-gradient(circle at 50% 35%,#302d43 0,#181724 48%,#0c0b12 100%);
-  color:#fff; font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-}
-.wrap{width:min(94vw,720px);text-align:center;position:relative}
-.title{
-  margin:0;font-size:clamp(31px,8vw,65px);color:#ff94c9;
-  text-shadow:0 0 22px #ff68b177;
-  opacity:0;animation:titleIn .8s .15s forwards, titleDance 2.2s 1s ease-in-out infinite;
-}
-.sub{
-  margin:8px 0 0;font-size:clamp(15px,4vw,20px);opacity:0;
-  animation:fadeUp .7s .75s forwards, wiggle 2.6s 1.5s ease-in-out infinite;
-}
-.scene{height:365px;position:relative;margin-top:2px}
-.plate{
-  position:absolute;left:50%;bottom:35px;width:300px;height:10px;
-  transform:translateX(-50%) scaleX(0);border-radius:50%;background:#f6eae5;
-  box-shadow:0 8px 20px #0008;animation:plateIn .45s 1.2s forwards;
-}
-.layer{
-  position:absolute;left:50%;transform:translateX(-50%);
-  opacity:0;box-shadow:inset 0 -8px 0 #00000013,0 7px 12px #0004;
-}
-.l1{
-  bottom:44px;width:245px;height:67px;border-radius:13px 13px 17px 17px;
-  background:
-    radial-gradient(circle at 18% 38%,#ffd9e7 0 3px,transparent 4px),
-    radial-gradient(circle at 78% 62%,#ffd9e7 0 3px,transparent 4px),
-    linear-gradient(180deg,#b96875 0%,#9b5360 52%,#824651 100%);
-  border:1px solid #d9909b;
-  animation:drop1 .65s 1.6s cubic-bezier(.2,.9,.25,1.25) forwards;
-}
-.l2{
-  bottom:107px;width:205px;height:62px;border-radius:12px 12px 15px 15px;
-  background:
-    radial-gradient(circle at 24% 62%,#fff0f5 0 2px,transparent 3px),
-    radial-gradient(circle at 72% 35%,#fff0f5 0 2px,transparent 3px),
-    linear-gradient(180deg,#df8f9f 0%,#c87587 55%,#ad6072 100%);
-  border:1px solid #efb1bd;
-  animation:drop2 .65s 2.35s cubic-bezier(.2,.9,.25,1.25) forwards;
-}
-.l3{
-  bottom:165px;width:165px;height:58px;border-radius:12px 12px 14px 14px;
-  background:
-    radial-gradient(circle at 30% 55%,#fff 0 2px,transparent 3px),
-    radial-gradient(circle at 70% 58%,#fff 0 2px,transparent 3px),
-    linear-gradient(180deg,#f2a9b6 0%,#df8799 58%,#c96f82 100%);
-  border:1px solid #f7c4ce;
-  animation:drop3 .65s 3.1s cubic-bezier(.2,.9,.25,1.25) forwards;
-}
-.cream{
-  position:absolute;left:-4px;right:-4px;top:-10px;height:27px;
-  background:linear-gradient(180deg,#fffdfb 0%,#fff1ed 62%,#f8d9dc 100%);
-  border-radius:16px 16px 11px 11px;
-  box-shadow:0 3px 0 #ffffff77,inset 0 -3px 4px #e9b9c044;
-}
-.cream:before,.cream:after{content:"";position:absolute;top:12px;background:#fff1e7;border-radius:0 0 12px 12px}
-.cream:before{left:25%;width:22px;height:23px}.cream:after{right:20%;width:18px;height:17px}
-.candle{
-  position:absolute;left:50%;bottom:221px;width:11px;height:57px;opacity:0;
-  transform:translate(-50%,-180px) rotate(-12deg);
-  border-radius:5px;background:repeating-linear-gradient(45deg,#fff 0 6px,#ff85b9 6px 12px);
-  animation:candleDrop .7s 3.9s cubic-bezier(.2,.9,.25,1.25) forwards;
-}
-.wick{position:absolute;width:2px;height:9px;background:#333;left:4.5px;top:-8px}
-.flame{
-  position:absolute;left:50%;top:-39px;width:21px;height:31px;opacity:0;
-  transform:translateX(-50%) scale(.2);
-  border-radius:50% 50% 45% 45%;
-  background:radial-gradient(circle at 50% 65%,#fffbd0 0 18%,#ffd65a 35%,#ff8537 62%,transparent 65%);
-  filter:drop-shadow(0 0 13px #ffc64f);
-  animation:light .35s 4.65s forwards, flameDance .16s 5s infinite alternate;
-}
-.btn{
-  opacity:0;transform:translateY(10px);
-  animation:fadeUp .55s 5.15s forwards, buttonBounce 1.6s 5.8s ease-in-out infinite;
-  border:0;border-radius:999px;padding:13px 23px;font-size:17px;font-weight:800;
-  background:#ff91c7;color:#351626;box-shadow:0 8px 26px #ff6eb755;
-}
-.message{
-  min-height:58px;margin-top:17px;font-size:clamp(19px,5vw,27px);font-weight:750;
-  opacity:0;transform:scale(.7) rotate(-2deg);
-}
-.message.show{animation:messagePop .65s forwards, messageDance 2s .7s ease-in-out infinite}
-.float{position:fixed;bottom:-35px;pointer-events:none;animation:floatUp linear forwards}
-.spark{position:fixed;pointer-events:none;animation:burst 1.25s ease-out forwards}
-body.blown .flame{animation:flameOut .22s forwards}
-body.blown .wick:after{content:"";position:absolute;left:-8px;top:-28px;width:18px;height:28px;border-radius:50%;background:#ddd4;filter:blur(5px);animation:smoke 1.7s forwards}
+<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#17132b"><title>ญาณิศา ตู้คีบ — เกมคีบตุ๊กตา</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap');*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Kanit,system-ui,sans-serif;color:#fff}body{background:radial-gradient(ellipse at 50% 0%,#57436d 0%,#251e3d 43%,#141225 100%);display:flex;align-items:center;justify-content:center;padding:20px 12px 28px;overflow-x:hidden}body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.35;background-image:radial-gradient(#fff 1px,transparent 1px);background-size:55px 65px}.app{width:min(100%,490px);position:relative}.top{text-align:center;margin-bottom:12px}.eyebrow{font-size:11px;letter-spacing:4px;color:#f8c8e4}.top h1{font-size:clamp(27px,7vw,37px);line-height:1.15;margin:4px 0 5px;font-weight:700;letter-spacing:1px;background:linear-gradient(90deg,#fff,#ffbde0,#d8c6ff);color:transparent;background-clip:text}.subtitle{font-size:12px;color:#d4c8e5}.stats{display:flex;gap:9px;margin:14px 0}.stat{flex:1;background:#ffffff10;border:1px solid #ffffff24;border-radius:15px;padding:9px 12px;display:flex;align-items:center;justify-content:space-between;box-shadow:inset 0 1px #ffffff12}.stat span{font-size:12px;color:#d9cde7}.stat strong{font-size:20px;color:#fff}.machine{position:relative;border-radius:27px 27px 22px 22px;padding:12px 13px 17px;background:linear-gradient(110deg,#ff9bc5,#ff6fac 35%,#e86ca9 70%,#b55b9e);box-shadow:0 20px 50px #09061399,inset 3px 3px #ffffff66,inset -4px -4px #712b6b70;border:3px solid #ffbbda}.marquee{height:44px;border-radius:17px 17px 9px 9px;background:linear-gradient(#fff5ff,#ffdaef);display:flex;align-items:center;justify-content:center;color:#9e4a8c;letter-spacing:3px;font-weight:700;font-size:17px;text-shadow:0 1px white;box-shadow:inset 0 -3px #edb1d5}.bulb{width:9px;height:9px;border-radius:50%;background:#fff9bd;box-shadow:0 0 10px #fff4b0;position:absolute;top:30px;animation:twinkle 1.5s infinite alternate}.bulb.left{left:24px}.bulb.right{right:24px;animation-delay:.7s}@keyframes twinkle{to{opacity:.45}}.glass{margin-top:10px;border-radius:12px;overflow:hidden;border:6px solid #ffdcf0;box-shadow:inset 0 0 25px #fff8,0 5px 0 #bb498b;background:#b6d9e6;position:relative}.glass canvas{width:100%;height:auto;display:block;touch-action:none}.panel{margin-top:14px;background:linear-gradient(130deg,#ffdaee,#f7a7d0);border:3px solid #ffe6f4;border-radius:17px;padding:12px;box-shadow:inset 0 -4px #dc77b2}.paneltop{display:flex;align-items:center;justify-content:space-between;color:#9c447f;font-size:12px;font-weight:600;margin-bottom:9px}.pill{background:#fff8ff;border-radius:20px;padding:3px 10px;color:#a64a88}.controls{display:grid;grid-template-columns:1fr 1fr 1.35fr;gap:9px}.ctrl{border:0;border-radius:15px;min-height:57px;background:linear-gradient(#fff,#ffe7f4);color:#ae4a88;font:700 20px Kanit,system-ui;box-shadow:0 5px 0 #d38caf,0 8px 12px #7a306133;touch-action:none;user-select:none;cursor:pointer}.ctrl:active,.ctrl.active{transform:translateY(4px);box-shadow:0 1px 0 #d38caf}.ctrl.drop{font-size:16px;background:linear-gradient(#9e7af9,#7557da);color:white;box-shadow:0 5px 0 #5644a0,0 8px 12px #7a306133}.ctrl.drop:active{box-shadow:0 1px 0 #5644a0}.bottom{display:flex;justify-content:space-between;align-items:center;margin-top:15px;gap:10px}.hint{font-size:11px;color:#d8cbe5;line-height:1.6}.secondary{background:#ffffff15;border:1px solid #ffffff35;border-radius:12px;color:#f6e7ff;padding:8px 12px;font:500 12px Kanit;cursor:pointer}.message{min-height:30px;text-align:center;font-size:13px;color:#ffe8fa;margin:11px 0 0}.collection{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;min-height:29px;margin-top:5px}.prize{background:#ffffff24;border:1px solid #ffffff44;border-radius:9px;padding:2px 7px;font-size:20px}.overlay{position:fixed;inset:0;background:#130d26b8;display:none;align-items:center;justify-content:center;padding:22px;z-index:5;backdrop-filter:blur(5px)}.overlay.show{display:flex}.modal{background:linear-gradient(145deg,#fff3fa,#f6e8ff);color:#70416e;text-align:center;padding:28px 25px;border-radius:26px;width:min(100%,340px);box-shadow:0 25px 70px #0008}.modal .big{font-size:75px;animation:pop .5s both}@keyframes pop{from{transform:scale(.4) rotate(-20deg)}to{transform:scale(1)}}.modal h2{margin:4px 0;font-size:24px}.modal p{font-size:14px}.modal button{background:#9169eb;color:white;border:0;border-radius:13px;padding:12px 24px;font:600 14px Kanit;cursor:pointer}.sparkle{position:absolute;color:#fff;pointer-events:none;animation:float 3s ease-in-out infinite}.sparkle.a{top:60px;left:-10px}.sparkle.b{top:120px;right:-13px;animation-delay:1s}@keyframes float{50%{transform:translateY(-12px)}}@media(max-width:370px){.machine{padding:9px}.controls{gap:6px}.ctrl{min-height:51px}.panel{padding:9px}.marquee{font-size:14px}}@media(min-height:900px){body{align-items:center}}
 
-@keyframes titleIn{to{opacity:1}}
-@keyframes titleDance{0%,100%{transform:rotate(-1deg) translateY(0) scale(1)}50%{transform:rotate(1deg) translateY(-5px) scale(1.025)}}
-@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
-@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-1deg)}75%{transform:rotate(1deg)}}
-@keyframes plateIn{to{transform:translateX(-50%) scaleX(1)}}
-@keyframes drop1{0%{opacity:0;transform:translate(-50%,-300px) rotate(-7deg)}70%{opacity:1;transform:translate(-50%,8px) rotate(2deg)}100%{opacity:1;transform:translate(-50%,0) rotate(0)}}
-@keyframes drop2{0%{opacity:0;transform:translate(-50%,-330px) rotate(8deg)}70%{opacity:1;transform:translate(-50%,7px) rotate(-2deg)}100%{opacity:1;transform:translate(-50%,0)}}
-@keyframes drop3{0%{opacity:0;transform:translate(-50%,-350px) rotate(-8deg)}70%{opacity:1;transform:translate(-50%,6px) rotate(2deg)}100%{opacity:1;transform:translate(-50%,0)}}
-@keyframes candleDrop{0%{opacity:0;transform:translate(-50%,-180px) rotate(-12deg)}70%{opacity:1;transform:translate(-50%,5px) rotate(4deg)}100%{opacity:1;transform:translate(-50%,0) rotate(0)}}
-@keyframes light{to{opacity:1;transform:translateX(-50%) scale(1)}}
-@keyframes flameDance{from{transform:translateX(-50%) rotate(-5deg) scale(.94)}to{transform:translateX(-50%) rotate(5deg) scale(1.08)}}
-@keyframes buttonBounce{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-4px) scale(1.035)}}
-@keyframes messagePop{60%{opacity:1;transform:scale(1.08) rotate(1deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
-@keyframes messageDance{0%,100%{transform:translateY(0) rotate(-.5deg)}50%{transform:translateY(-5px) rotate(.5deg)}}
-@keyframes floatUp{to{transform:translateY(-115vh) rotate(360deg);opacity:0}}
-@keyframes burst{to{transform:translate(var(--x),var(--y)) rotate(240deg) scale(.2);opacity:0}}
-@keyframes flameOut{to{opacity:0;transform:translateX(-50%) scale(.1)}}
-@keyframes smoke{to{transform:translateY(-50px) scale(2);opacity:0}}
-</style>
-</head>
-<body>
-<main class="wrap">
-  <h1 class="title">Happy Birthday Yanisa 🎂</h1>
-  <div class="sub">สุขสันต์วันเกิดย้อนหลังนะที่รัก เค้ารักเธอมากๆนะ ❤️</div>
-
-  <div class="scene">
-    <div class="plate"></div>
-    <div class="layer l1"><div class="cream"></div></div>
-    <div class="layer l2"><div class="cream"></div></div>
-    <div class="layer l3"><div class="cream"></div></div>
-    <div class="candle"><div class="wick"></div><div class="flame"></div></div>
-  </div>
-
-  <button class="btn" id="blow">🎂 อธิษฐานก่อนเป่าเทียน</button>
-  <div class="message" id="msg">Happy Birthday, Yanisa ❤️<br>ขอให้มีความสุขมาก ๆ ในทุกวันนะ</div>
-</main>
-<script>
-const btn=document.getElementById('blow'),msg=document.getElementById('msg');
-let done=false;
-function floater(){
- const e=document.createElement('div');e.className='float';
- e.textContent=['💗','❤️','💕','✨','🎈'][Math.floor(Math.random()*5)];
- e.style.left=Math.random()*100+'vw';e.style.fontSize=(15+Math.random()*25)+'px';
- e.style.animationDuration=(3+Math.random()*3)+'s';document.body.appendChild(e);
- setTimeout(()=>e.remove(),6500);
-}
-function burst(){
- for(let i=0;i<42;i++){
-  const e=document.createElement('div');e.className='spark';
-  e.textContent=['💗','✨','🎉','🎈','💕'][Math.floor(Math.random()*5)];
-  e.style.left='50vw';e.style.top='48vh';e.style.fontSize=(15+Math.random()*18)+'px';
-  const a=Math.random()*Math.PI*2,d=90+Math.random()*280;
-  e.style.setProperty('--x',Math.cos(a)*d+'px');e.style.setProperty('--y',Math.sin(a)*d+'px');
-  document.body.appendChild(e);setTimeout(()=>e.remove(),1400);
- }
-}
-setInterval(()=>{if(Math.random()>.5)floater()},950);
-btn.onclick=()=>{
- if(done){location.reload();return}
- done=true;document.body.classList.add('blown');msg.classList.add('show');
- btn.textContent='💗 ดูอีกครั้ง';burst();
- for(let i=0;i<22;i++)setTimeout(floater,i*100);
-};
-</script>
-</body>
-</html>
-<style>
-.layer:before{
-  content:"";
-  position:absolute;left:10%;right:10%;bottom:9px;height:8px;
-  background:radial-gradient(circle,#ffe4a8 0 2px,transparent 2.8px) 0 0/20px 8px repeat-x;
-  opacity:.9;
-}
-.l3:after{
-  content:"🍓";
-  position:absolute;left:50%;top:-27px;
-  transform:translateX(-50%) rotate(-8deg);
-  font-size:23px;
-  filter:drop-shadow(0 3px 2px #0002);
-}
-.plate{
-  background:linear-gradient(180deg,#fff,#f1dfe5 70%,#d7bdc7);
-  border:1px solid #fff;
-  box-shadow:0 8px 22px #0008,0 0 20px #ffb4d322;
-}
-.candle{
-  box-shadow:inset 2px 0 3px #fff8,0 2px 5px #0003;
-}
-.scene:after{
-  content:"";
-  position:absolute;z-index:-1;left:50%;bottom:18px;width:330px;height:70px;
-  transform:translateX(-50%);
-  background:radial-gradient(ellipse,#ff8fbd22 0%,transparent 70%);
-  filter:blur(8px);
-}
-</style>
+/* Refined animated arcade interface */
+.top{animation:headerEntrance .8s cubic-bezier(.2,.8,.2,1) both}
+.top h1{font-size:clamp(29px,7.5vw,41px);background:linear-gradient(110deg,#fff 5%,#ffc5e7 26%,#e1c6ff 45%,#fff 58%,#ffb7dc 80%,#fff 100%);background-size:250% auto;background-clip:text;-webkit-background-clip:text;color:transparent;animation:titleShimmer 5s linear infinite,headerFloat 4s ease-in-out infinite;filter:drop-shadow(0 2px 12px #ffaddb44)}
+.subtitle{font-size:14px;animation:fadeRise .8s .18s both}
+.credit{font-size:10px;letter-spacing:1.2px;color:#c9b9d7;margin-top:6px;opacity:.8;animation:fadeRise .8s .35s both}
+@keyframes titleShimmer{to{background-position:250% center}}
+@keyframes headerFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes headerEntrance{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes fadeRise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.stats{animation:fadeRise .7s .3s both}.stat{transition:transform .25s,box-shadow .25s,border-color .25s}.stat:hover{transform:translateY(-3px);border-color:#ffd6f366;box-shadow:0 7px 20px #ffb0de1b}
+.machine{animation:machineEnter .85s .15s both;transition:box-shadow .3s}
+@keyframes machineEnter{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.marquee{background-size:200% 100%;animation:marqueeGlow 3s ease-in-out infinite alternate}
+@keyframes marqueeGlow{to{box-shadow:inset 0 -3px #edb1d5,0 0 18px #fff7}}
+.ctrl{position:relative;overflow:hidden;transition:transform .15s ease,box-shadow .15s ease,filter .2s ease}
+.ctrl::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 20%,#ffffff88 48%,transparent 75%);transform:translateX(-160%);pointer-events:none}
+.ctrl:hover::after{animation:buttonSweep .7s ease-out}.ctrl:hover{filter:brightness(1.06)}
+@keyframes buttonSweep{to{transform:translateX(160%)}}
+.ctrl.drop{animation:dropGlow 2.8s ease-in-out infinite}
+@keyframes dropGlow{0%,100%{filter:drop-shadow(0 0 0 #c2a2ff00)}50%{filter:drop-shadow(0 0 9px #c2a2ff99)}}
+.ctrl:active,.ctrl.active{animation:none;transform:translateY(4px) scale(.96)}
+.secondary,.modal button{transition:transform .18s,background .2s,box-shadow .2s}.secondary:hover,.modal button:hover{transform:translateY(-2px);box-shadow:0 5px 14px #0003}.secondary:active,.modal button:active{transform:scale(.95)}
+.overlay.show .modal{animation:modalIn .38s cubic-bezier(.2,1.3,.3,1) both}
+@keyframes modalIn{from{opacity:0;transform:translateY(30px) scale(.82)}to{opacity:1;transform:translateY(0) scale(1)}}
+.prize{animation:prizeIn .4s cubic-bezier(.2,1.3,.3,1) both}
+@keyframes prizeIn{from{opacity:0;transform:scale(.4) rotate(-20deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+.message{transition:color .2s}.ctrl:focus-visible,.secondary:focus-visible,.modal button:focus-visible{outline:3px solid #fff;outline-offset:3px}
+@media(hover:none){.ctrl:hover::after{animation:none}.ctrl:hover{filter:none}}
+@media(prefers-reduced-motion:reduce){.top,.top h1,.subtitle,.credit,.stats,.machine,.marquee,.ctrl.drop,.sparkle,.bulb,.prize,.overlay.show .modal{animation:none!important}*,*::before,*::after{transition:none!important}}
+</style></head><body><main class="app"><span class="sparkle a">✦</span><span class="sparkle b">✧</span><header class="top"><h1>ญาณิศา ตู้คีบ</h1><div class="subtitle">ขอให้สนุกกับการคีบตุ๊กตา</div><div class="credit">Create by Hussakorn</div></header><section class="stats"><div class="stat"><span>🪙 เหรียญ</span><strong id="coins">10</strong></div><div class="stat"><span>🏆 คีบสำเร็จ</span><strong id="wins">0</strong></div><div class="stat"><span>🎯 โอกาสคีบ</span><strong id="tries">0</strong></div></section><div class="machine"><div class="bulb left"></div><div class="bulb right"></div><div class="marquee">✧ ญาณิศา ตู้คีบ ✧</div><div class="glass"><canvas id="game" width="420" height="405" aria-label="เกมคีบตุ๊กตา"></canvas></div><div class="panel"><div class="paneltop"><span>🎮 CONTROL PANEL</span><span class="pill" id="status">พร้อมเล่น!</span></div><div class="controls"><button class="ctrl" id="left" aria-label="เลื่อนซ้าย">◀</button><button class="ctrl" id="right" aria-label="เลื่อนขวา">▶</button><button class="ctrl drop" id="drop">✦ คีบเลย!</button></div></div></div><div class="message" id="message" aria-live="polite">เลื่อนหัวคีบให้ตรงกับตุ๊กตา แล้วกดคีบ!</div><div class="collection" id="collection"></div><div class="bottom"><div class="hint">⌨️ คอมพิวเตอร์: ← → และ Space<br>📱 มือถือ: กดปุ่มซ้าย–ขวาค้างเพื่อเลื่อน</div><button class="secondary" id="reset">↻ เริ่มใหม่</button></div></main><div class="overlay" id="overlay"><div class="modal"><div class="big" id="resultEmoji">🧸</div><h2 id="resultTitle">เยี่ยมมาก!</h2><p id="resultText">คุณได้รับตุ๊กตาแล้ว</p><button id="continue">เล่นต่อ ✦</button></div></div><script>
+(()=>{'use strict';const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');const $=id=>document.getElementById(id);const W=420,H=405,ground=344,types=[{emoji:'🐻',color:'#d6a374',name:'น้องหมี'},{emoji:'🐰',color:'#fff0f4',name:'น้องกระต่าย'},{emoji:'🐱',color:'#f4c9a6',name:'น้องแมว'},{emoji:'🐼',color:'#e9e9f0',name:'น้องแพนด้า'},{emoji:'🐸',color:'#a8dbac',name:'น้องกบ'},{emoji:'🐷',color:'#ffb5c9',name:'น้องหมู'},{emoji:'🦊',color:'#f2b879',name:'น้องจิ้งจอก'},{emoji:'🐨',color:'#bcc4dc',name:'น้องโคอาล่า'}];let toys=[],coins=10,wins=0,tries=0,x=210,y=63,phase='idle',phaseTime=0,targetY=285,grabbed=null,move=0,last=0,shake=0;const rand=(a,b)=>a+Math.random()*(b-a);function populate(){toys=[];for(let row=0;row<2;row++)for(let i=0;i<5;i++){let t=types[(i*3+row*2)%types.length];toys.push({...t,x:56+i*77+rand(-9,9),y:ground-27-row*49+rand(-5,5),size:36,tilt:rand(-.18,.18),taken:false})}}function stats(){$('coins').textContent=coins;$('wins').textContent=wins;$('tries').textContent=tries}function msg(s){$('message').textContent=s}function roundRect(x,y,w,h,r,color){ctx.fillStyle=color;ctx.beginPath();if(ctx.roundRect){ctx.roundRect(x,y,w,h,r)}else{ctx.rect(x,y,w,h)}ctx.fill()}function toy(t){ctx.save();ctx.translate(t.x,t.y);ctx.rotate(t.tilt||0);let s=t.size;ctx.fillStyle='#51395426';ctx.beginPath();ctx.ellipse(0,s*.92,s*.8,7,0,0,Math.PI*2);ctx.fill();ctx.fillStyle=t.color;ctx.beginPath();ctx.ellipse(-s*.53,-s*.58,s*.28,s*.35,0,0,7);ctx.ellipse(s*.53,-s*.58,s*.28,s*.35,0,0,7);ctx.fill();ctx.beginPath();ctx.ellipse(0,s*.35,s*.63,s*.63,0,0,7);ctx.fill();ctx.beginPath();ctx.arc(0,-s*.35,s*.77,0,7);ctx.fill();ctx.fillStyle='#41334c';ctx.beginPath();ctx.arc(-s*.26,-s*.4,2.7,0,7);ctx.arc(s*.26,-s*.4,2.7,0,7);ctx.fill();ctx.fillStyle='#e889a8';ctx.beginPath();ctx.ellipse(0,-s*.12,5,3.5,0,0,7);ctx.fill();ctx.fillStyle='#fff9';ctx.beginPath();ctx.arc(-s*.43,-s*.19,4,0,7);ctx.arc(s*.43,-s*.19,4,0,7);ctx.fill();ctx.font='42px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(t.emoji,0,-s*.12);ctx.textAlign='start';ctx.textBaseline='alphabetic';ctx.restore()}function draw(time){let grad=ctx.createLinearGradient(0,0,0,H);grad.addColorStop(0,'#c8eaf1');grad.addColorStop(.75,'#f6d5e8');grad.addColorStop(1,'#eab1ce');ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);ctx.fillStyle='#ffffff45';ctx.beginPath();ctx.moveTo(20,0);ctx.lineTo(75,0);ctx.lineTo(0,250);ctx.lineTo(0,100);ctx.fill();for(let i=0;i<18;i++){let px=(i*73+30)%W,py=(i*89+42)%295;ctx.fillStyle=i%3===0?'#fff9':'#ffffff55';ctx.font=(i%3===0?19:12)+'px sans-serif';ctx.fillText(i%2?'✦':'✧',px,py)}roundRect(0,ground-6,W,68,0,'#edb4d4');roundRect(0,ground-6,W,10,0,'#fff0f7');roundRect(8,ground+8,95,51,9,'#a767a6');roundRect(18,ground+14,75,35,6,'#65466f');ctx.font='11px Kanit';ctx.fillStyle='#fff';ctx.fillText('PRIZE ↓',34,ground+33);for(let t of toys)if(!t.taken&&t!==grabbed)toy(t);ctx.strokeStyle='#8a6a9d';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,y);ctx.stroke();roundRect(x-28,y-8,56,22,9,'#a68cc6');roundRect(x-22,y-5,44,12,6,'#e8d8f5');ctx.strokeStyle='#76608e';ctx.lineWidth=5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x-12,y+11);ctx.lineTo(x-22,y+32);ctx.lineTo(x-15,y+43);ctx.moveTo(x+12,y+11);ctx.lineTo(x+22,y+32);ctx.lineTo(x+15,y+43);ctx.stroke();if(grabbed){grabbed.x=x;grabbed.y=y+73;grabbed.tilt=Math.sin(time/130)*.09;toy(grabbed)}ctx.fillStyle='#ffffff44';ctx.fillRect(W-9,0,9,H);if(shake>0){shake*=.88;if(shake<.1)shake=0}}function result(win,t){$('overlay').classList.add('show');$('resultEmoji').textContent=win?t.emoji:'💫';$('resultTitle').textContent=win?'คีบสำเร็จ!':'เกือบแล้ว!';$('resultText').textContent=win?'คุณได้รับ'+t.name+'เข้าคอลเลกชัน ♡':'ตุ๊กตาหลุดไป ลองอีกครั้งนะ!';$('continue').textContent=coins>0?'เล่นต่อ ✦':'เติมเหรียญแล้วเล่นต่อ ✦';$('status').textContent=win?'WINNER!':'ลองอีกครั้ง'}function startDrop(){if(phase!=='idle'||coins<=0)return;coins--;tries++;stats();phase='down';phaseTime=0;move=0;targetY=ground-104;msg('กำลังหย่อนหัวคีบ… ✨');$('status').textContent='กำลังคีบ…'}function step(dt){if(phase==='idle'){x=Math.max(36,Math.min(W-36,x+move*dt*.23));return}phaseTime+=dt;if(phase==='down'){y=Math.min(targetY,y+dt*.23);if(y>=targetY){phase='grab';phaseTime=0;let candidates=toys.filter(t=>!t.taken).map(t=>({t,d:Math.abs(t.x-x)+Math.abs(t.y-(y+73))*.12})).sort((a,b)=>a.d-b.d);let c=candidates[0];if(c&&Math.abs(c.t.x-x)<30&&Math.random()<.78){grabbed=c.t;msg('จับได้แล้ว! กำลังยกขึ้น…')}else msg('อุ๊ปส์! ลองลุ้นอีกนิด…')}}else if(phase==='grab'){if(phaseTime>550){phase='up';phaseTime=0}}else if(phase==='up'){y=Math.max(63,y-dt*.27);if(y<=63){phase='return';phaseTime=0}}else if(phase==='return'){x=Math.max(55,x-dt*.25);if(x<=55){phase='release';phaseTime=0}}else if(phase==='release'){if(phaseTime>400){let won=!!grabbed,t=grabbed;if(won){t.taken=true;wins++;const badge=document.createElement('span');badge.className='prize';badge.textContent=t.emoji;badge.title=t.name;$('collection').appendChild(badge)}grabbed=null;phase='idle';x=210;y=63;stats();result(won,t);if(toys.every(t=>t.taken))populate();if(coins===0)msg('เหรียญหมดแล้ว กดเติมเหรียญเพื่อเล่นต่อ');else msg(won?'สุดยอด! คีบตัวต่อไปกันเลย ✨':'ลองขยับให้ตรงกลางตุ๊กตามากขึ้นนะ')}}}function frame(t){let dt=Math.min(t-last||16,45);last=t;step(dt);draw(t);requestAnimationFrame(frame)}function setMove(dir){if(phase==='idle')move=dir}for(let [id,dir] of [['left',-1],['right',1]]){let b=$(id);b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);setMove(dir);b.classList.add('active')});for(let ev of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(ev,()=>{move=0;b.classList.remove('active')})}window.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();if(e.repeat&&e.code==='Space')return;if(e.code==='ArrowLeft')setMove(-1);if(e.code==='ArrowRight')setMove(1);if(e.code==='Space')startDrop()});window.addEventListener('keyup',e=>{if(e.code==='ArrowLeft'&&move===-1||e.code==='ArrowRight'&&move===1)move=0});window.addEventListener('blur',()=>move=0);$('drop').addEventListener('click',startDrop);$('continue').addEventListener('click',()=>{$('overlay').classList.remove('show');if(coins===0){coins=10;stats();msg('เติมเหรียญให้แล้ว! มาเล่นต่อกัน ✨')}$('status').textContent='พร้อมเล่น!'});$('reset').addEventListener('click',()=>{if(phase!=='idle')return;if(!confirm('เริ่มเกมใหม่และล้างคอลเลกชันทั้งหมด?'))return;coins=10;wins=tries=0;grabbed=null;x=210;y=63;populate();$('collection').replaceChildren();$('overlay').classList.remove('show');$('status').textContent='พร้อมเล่น!';msg('เริ่มใหม่แล้ว! เลือกตุ๊กตาที่ชอบได้เลย');stats()});populate();stats();requestAnimationFrame(frame)})();
+</script></body></html>
