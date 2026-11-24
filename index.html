@@ -15,7 +15,9 @@ header small,header p,h2,label,input,textarea,.choice span,#previewName,#wishOut
 h1{animation:textEnter 1s both,goldGlow 3s 1s infinite}
 header p{animation-delay:.25s}label{animation-delay:.15s}.choice span{display:block;animation-delay:.2s}.choice svg,#preview svg{animation:bob 3s ease-in-out infinite}.choice.active{box-shadow:0 0 20px #ffd78055}.primary{animation:textEnter .8s both,shine 3s 1s infinite}#previewName{animation:textEnter .6s both,goldGlow 3s infinite}#finalWish:not([hidden]){animation:textEnter 1.8s both,goldGlow 3s 1.8s infinite}#celebrate h2{animation:textEnter 1.2s both,goldGlow 3s infinite}#wishOut{animation:textEnter 1.2s .4s both}#again{z-index:2}#celebrate{background:linear-gradient(#07142699,transparent);border-radius:24px}canvas{z-index:0;pointer-events:none}main{position:relative;z-index:1}.panel{background:#08172cbd} @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important}}
 header[hidden]{display:none!important;}
-@keyframes flameDance{0%,100%{transform:rotate(-5deg) scale(.94,1.04)}35%{transform:rotate(7deg) scale(1.07,.92)}70%{transform:rotate(-2deg) scale(.9,1.1)}}.flame{transform-box:fill-box;transform-origin:50% 65%;animation:flameDance .8s ease-in-out infinite}.choice svg{max-width:145px}#preview{width:190px}</style>
+@keyframes flameDance{0%,100%{transform:rotate(-5deg) scale(.94,1.04)}35%{transform:rotate(7deg) scale(1.07,.92)}70%{transform:rotate(-2deg) scale(.9,1.1)}}.flame{transform-box:fill-box;transform-origin:50% 65%;animation:flameDance .8s ease-in-out infinite}.choice svg{max-width:145px}#preview{width:190px}
+.panel{background:#08172ca8;backdrop-filter:blur(5px)}
+</style>
 </head>
 <body>
 <canvas id="scene">
@@ -80,6 +82,27 @@ const visitors=Array.from({length:12},(_,i)=>({side:i<6?-1:1,offset:(i%6)/6,phas
 const offerings=Array.from({length:24},(_,i)=>({type:i%8,x:Math.random(),depth:Math.random(),speed:rand(.008,.024),phase:rand(0,6.28)}));
 function line(x,y,x2,y2,color,width){ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x2,y2);ctx.stroke();}
 function livingFlame(x,y,size,t,phase=0){let f=t*9+phase,dx=Math.sin(f)*size*.009, r=size*(.13+.025*Math.sin(f*1.7));glow(x+dx,y,r,'#ffad3855');ctx.save();ctx.globalCompositeOperation='lighter';ctx.fillStyle='#fff4b8';ctx.globalAlpha=.55+.25*Math.sin(f);ctx.beginPath();ctx.ellipse(x+dx,y,size*.012,size*.033,Math.sin(f)*.2,0,Math.PI*2);ctx.fill();ctx.restore();}
+// Illuminated Thai temple fair on the opposite riverbank.
+function templeFair(t){
+ const s=Math.min(W/760,H/510), base=H*.555;
+ const colors=['#ffce66','#ff729d','#70eaff','#a7ff92','#c9a0ff'];
+ function bulb(x,y,i,r=2){let a=.55+.45*Math.pow(Math.sin(t*2.7+i*1.83),2),col=colors[i%5];ctx.save();ctx.globalAlpha=a;glow(x,y,r*5,col+'55');ctx.fillStyle=col;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();ctx.restore();}
+ function poly(p,fill,stroke){ctx.beginPath();p.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.stroke();}}
+ ctx.save();ctx.translate(W*.38,base);ctx.scale(s,s);
+ glow(0,-75,180,'#ffb43b22');
+ // Golden chedi and its tiered spire.
+ ctx.save();ctx.translate(-190,0);for(let i=0;i<4;i++){ctx.fillStyle=i%2?'#b77b32':'#e3ad55';ctx.fillRect(-42+i*6,-9-i*8,84-i*12,8);}
+ ctx.beginPath();ctx.moveTo(-23,-33);ctx.bezierCurveTo(-42,-61,-14,-83,-8,-94);ctx.lineTo(8,-94);ctx.bezierCurveTo(14,-83,42,-61,23,-33);ctx.closePath();let g=ctx.createLinearGradient(-30,0,30,0);g.addColorStop(0,'#79501f');g.addColorStop(.5,'#ffe29a');g.addColorStop(1,'#a56a27');ctx.fillStyle=g;ctx.fill();for(let i=0;i<8;i++){ctx.fillStyle='#e9bd68';ctx.fillRect(-10+i*.9,-96-i*5,20-i*1.8,3);}poly([[-4,-134],[0,-158],[4,-134]],'#ffdf88');glow(0,-151,12,'#ffe6a766');ctx.restore();
+ // Main ubosot: lit walls, columns, layered Thai gables and chofah finials.
+ ctx.fillStyle='#c7a477';ctx.fillRect(-104,-79,208,76);ctx.fillStyle='#775238';ctx.fillRect(-112,-8,224,8);
+ for(let i=-84;i<=84;i+=42){ctx.fillStyle='#704327';ctx.fillRect(i-9,-63,18,47);ctx.fillStyle='#ffcb65';ctx.fillRect(i-5,-57,10,29);glow(i,-42,19,'#ffb74355');ctx.fillStyle='#f4d69a';ctx.fillRect(i+15,-73,5,67);}
+ for(let k=0;k<3;k++){let y=-70-k*27,w=126-k*22;poly([[-w,y],[0,y-58],[w,y],[w-12,y+9],[0,y-39],[-w+12,y+9]],'#702b35','#f4bd57');poly([[-w+15,y-3],[0,y-48],[w-15,y-3]],'#9e4935','#e5a94d');for(let i=0;i<=20;i++){let x=-w+i*w/10;bulb(x,y-58*(1-Math.abs(x)/w),i+k*3,1.5);}line(-w,y,-w-5,y-13,'#ffce70',2);line(w,y,w+5,y-13,'#ffce70',2);line(0,y-58,4,y-73,'#ffda85',2);}
+ ctx.restore();
+ // Fair stalls, strings of multicolored lights, and water reflections.
+ for(let j=0;j<7;j++){let x=W*(.045+j*.15),w=Math.min(65,W*.11),y=base-3;ctx.fillStyle='#392c36';ctx.fillRect(x-w/2,y-20,w,20);poly([[x-w*.65,y-20],[x,y-39],[x+w*.65,y-20]],['#a84460','#326f85','#b27b37'][j%3]);ctx.fillStyle='#ffce78';ctx.fillRect(x-w*.35,y-16,w*.7,11);for(let k=0;k<5;k++)bulb(x-w*.5+k*w/4,y-20,j+k,1.6);}
+ for(let j=0;j<Math.ceil(W/13);j++){let x=j*13,y=base-45+15*Math.sin(x/Math.max(30,W/9)*Math.PI);bulb(x,y,j,2);let col=colors[j%5];ctx.save();ctx.globalAlpha=.13+.07*Math.sin(t*2+j);for(let k=0;k<5;k++){let yy=base+12+k*8;line(x+Math.sin(t*2+k+j)*5-3,yy,x+Math.sin(t*2+k+j)*5+3+k,yy,col,1.5);}ctx.restore();}
+}
+
 function festival(t){
  // Far-bank lantern garland.
  for(let j=0;j<Math.ceil(W/32);j++){let x=j*32,y=H*.535+Math.sin(j*.4)*5;glow(x,y,13,'#ffc56b44');ctx.fillStyle='#e8ad59';ctx.fillRect(x-2,y-3,4,6);}
@@ -91,6 +114,7 @@ function festival(t){
 }
 
 function frame(ms){let t=ms/1000,dt=Math.min(.04,t-last||.016);last=t;let sky=ctx.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#03091c');sky.addColorStop(.55,'#20354e');sky.addColorStop(.56,'#102a40');sky.addColorStop(1,'#030e20');ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);for(let [x,y,r,p] of stars){ctx.globalAlpha=.45+.4*Math.sin(t*1.5+p);ctx.fillStyle='#fff5dc';ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill()}ctx.globalAlpha=1;let mx=W*.77,my=H*.18,mr=Math.min(W,H)*.065;glow(mx,my,mr*3,'#ffe6a94a');ctx.fillStyle='#fff1c8';ctx.beginPath();ctx.arc(mx,my,mr,0,7);ctx.fill();ctx.fillStyle='#0b1728';ctx.beginPath();ctx.moveTo(0,H*.56);for(let x=0;x<=W+20;x+=20)ctx.lineTo(x,H*.55-18*Math.abs(Math.sin(x*.012))-12*Math.abs(Math.cos(x*.037)));ctx.lineTo(W,H*.58);ctx.lineTo(0,H*.58);ctx.fill();for(let j=0;j<95;j++){let y=H*.57+j*H*.0047,x=mx+Math.sin(j*7.1+t)*W*.08,len=(8+j*.7)*(1+.5*Math.sin(j+t*2));ctx.strokeStyle=`rgba(255,222,151,${.04+.12*(1-j/95)})`;ctx.beginPath();ctx.moveTo(x-len,y);ctx.lineTo(x+len,y);ctx.stroke()}for(let j=0;j<45;j++){let y=H*.58+j*H*.01,x=(j*137+t*9)%W;ctx.strokeStyle='#9bc8e51b';ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(x+35,y+3,x+80,y);ctx.stroke()}
+templeFair(t);
 festival(t);
 if(floating){let elapsed=t-start,p=Math.min(1,elapsed/16),size=Math.min(230,W*.46)*(1-.62*p),x=W*.5+Math.sin(p*3)*W*.13,y=H*(.86-.27*p)+Math.sin(t*2)*3;glow(x,y,size*.7,'#ffb43b33');ctx.save();ctx.globalAlpha=.17;ctx.translate(x,y+size*.28);ctx.scale(1,-.35);if(imgs[selected].complete&&imgs[selected].naturalWidth)ctx.drawImage(imgs[selected],-size/2,-size*.5,size,size);ctx.restore();if(imgs[selected].complete&&imgs[selected].naturalWidth)ctx.drawImage(imgs[selected],x-size/2,y-size*.75,size,size);livingFlame(x,y-size*.75+size*26/110,size,t);ctx.font=`bold ${Math.max(14,size*.09)}px Tahoma`;ctx.textAlign='center';ctx.fillStyle='#fff2c3';ctx.shadowColor='#000';ctx.shadowBlur=8;ctx.fillText(person,x,y-size*.77+Math.sin(t*2)*2,W*.85);ctx.shadowBlur=0;if(elapsed>=27&&$('finalWish').hidden){$('finalWish').hidden=false;for(let j=0;j<5;j++)burst(W*(.15+j*.175),H*(.22+.08*Math.sin(j)),45+j*65);}if(elapsed<24&&t-lastFire>.55){launch();lastFire=t}}
 for(let r of rockets){r.age+=dt;let q=Math.min(1,r.age/.85),x=r.x+(r.tx-r.x)*q,y=r.y+(r.ty-r.y)*q;glow(x,y,12,'#fff2bbaa');ctx.strokeStyle='#ffe4a8';ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-(r.tx-r.x)*.04,y-(r.ty-r.y)*.04);ctx.stroke();if(q===1)burst(x,y,r.hue)}rockets=rockets.filter(r=>r.age<.85);ctx.globalCompositeOperation='lighter';for(let p of particles){p.life-=dt;p.vy+=65*dt;p.vx*=Math.pow(.65,dt);p.x+=p.vx*dt;p.y+=p.vy*dt;ctx.strokeStyle=`hsla(${p.hue},100%,70%,${Math.max(0,p.life/p.max)})`;ctx.lineWidth=p.size;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-p.vx*.035,p.y-p.vy*.035);ctx.stroke()}ctx.globalCompositeOperation='source-over';ctx.lineWidth=1;particles=particles.filter(p=>p.life>0);requestAnimationFrame(frame)}requestAnimationFrame(frame);
